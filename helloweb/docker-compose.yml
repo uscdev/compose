@@ -1,0 +1,19 @@
+version: '3.1'
+services:
+  helloweb:
+    image: dtr.docker.usc.edu/helloweb
+    networks:
+      web-bus:
+    ports:
+      - 8085:8080
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+networks:
+  web-bus:
+    external:
+      name: web-bus

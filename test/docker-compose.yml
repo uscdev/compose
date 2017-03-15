@@ -1,0 +1,28 @@
+version: '3.1'
+services:
+  ubuntu:
+    image: ubuntu
+    command: sleep 3600
+    ports:
+      - 80:80
+      - 443:443
+      - 8000:8000
+    secrets:
+      - docker.usc.edu.key
+      - docker.usc.edu.cer
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+networks:
+  web-bus:
+    external:
+      name: web-bus
+secrets:
+  docker.usc.edu.key:
+    external: true
+  docker.usc.edu.cer:
+    external: true

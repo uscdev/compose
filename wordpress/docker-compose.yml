@@ -1,0 +1,38 @@
+version: '3.1'
+services:
+  wordpress:
+    image: wordpress
+#    ports:
+#      - 8098:80
+    depends_on:
+      - db
+    networks:
+      wordpress-db:
+      web-bus:
+    volumes:
+      - ${USC_SHARED_DIR_NFS}/wordpress/data:/var/www/html
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    environment:
+      - WORDPRESS_DB_PASSWORD=${USC_WORDPRESS_DB_PASSWORD}
+      - WORDPRESS_DB_HOST=db
+      - ServerName=wordpress.docker.usc.edu
+  db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${USC_WORDPRESS_DB_PASSWORD}
+    networks:
+      wordpress-db:
+    volumes:
+      - ${USC_SHARED_DIR_NFS}/wordpress/db:/var/lib/mysql
+networks:
+  wordpress-db:
+    driver: overlay
+  web-bus:
+    external:
+      name: web-bus

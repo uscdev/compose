@@ -1,0 +1,17 @@
+version: '3.1'
+services:
+  itsdashboard:
+    image: dtr.docker.usc.edu/itsdashboard
+#    ports:
+#      - 8082:80
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+networks:
+  web-bus:
+    external:
+      name: web-bus

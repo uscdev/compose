@@ -1,0 +1,38 @@
+version: '3'
+services:
+  mobile-wordpress:
+    image: wordpress
+    ports:
+      - 8084:80
+    depends_on:
+      - mobile-db
+    networks:
+      mobile-db:
+      web-bus:
+    volumes:
+      - ${USC_SHARED_DIR_NFS}/mobile/data:/var/www/html
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    environment:
+      - WORDPRESS_DB_PASSWORD=${USC_MOBILE_DB_PASSWORD}
+      - WORDPRESS_DB_HOST=mobile-db
+      - ServerName=mobile.docker.usc.edu
+  mobile-db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${USC_MOBILE_DB_PASSWORD}
+    networks:
+      mobile-db:
+    volumes:
+      - ${USC_SHARED_DIR_NFS}/mobile/db:/var/lib/mysql
+networks:
+  mobile-db:
+    driver: overlay
+  web-bus:
+    external:
+      name: web-bus

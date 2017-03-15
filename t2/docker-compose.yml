@@ -1,0 +1,39 @@
+version: '3'
+services:
+  t2-tomcat:
+    image: dtr.docker.usc.edu/t2-tomcat
+#    ports:
+#      - 8098:80
+    depends_on:
+      - t2-mysql-demo-data
+    networks:
+      web-bus:
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+  t2-mysql-demo-data:
+    image: dtr.docker.usc.edu/t2-mysql-demo-data
+    environment:
+      MYSQL_ROOT_PASSWORD: ${USC_T2_DB_PASSWORD}
+#    volumes:
+#      - ${USC_SHARED_DIR_NFS}/wordpress/db:/var/lib/mysql
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname==${NODE02}
+    environment:
+      - MYSQL_ROOT_PASSWORD=${USC_T2_DB_PASSWORD}
+networks:
+  web-bus:
+    external:
+      name: web-bus

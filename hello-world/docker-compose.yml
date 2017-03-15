@@ -1,0 +1,6 @@
+version: '3'
+services:
+  helloworld:
+    image: tutum/hello-world
+    ports:
+      - "8099:80"
