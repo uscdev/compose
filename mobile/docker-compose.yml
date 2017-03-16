@@ -1,4 +1,4 @@
-version: '3'
+version: '3.1'
 services:
   mobile-wordpress:
     image: wordpress
@@ -10,7 +10,7 @@ services:
       mobile-db:
       web-bus:
     volumes:
-      - ${USC_SHARED_DIR_NFS}/mobile/data:/var/www/html
+      - ${USC_MOBILE_DATA_DIR}:/var/www/html
     deploy:
       replicas: 1
       update_config:
@@ -21,7 +21,7 @@ services:
     environment:
       - WORDPRESS_DB_PASSWORD=${USC_MOBILE_DB_PASSWORD}
       - WORDPRESS_DB_HOST=mobile-db
-      - ServerName=mobile.docker.usc.edu
+      - ServerName=${USC_MOBILE_SERVER_NAME}
   mobile-db:
     image: mysql
     environment:
@@ -29,7 +29,7 @@ services:
     networks:
       mobile-db:
     volumes:
-      - ${USC_SHARED_DIR_NFS}/mobile/db:/var/lib/mysql
+      - ${USC_MOBILE_DB_DIR}:/var/lib/mysql
 networks:
   mobile-db:
     driver: overlay

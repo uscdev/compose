@@ -1,4 +1,5 @@
 #!/bin/bash
+# Param 1: dev = swarm
 
 if [ ! -d "/run/secrets" ]; then
   ~/initsecrets.sh
@@ -14,6 +15,10 @@ export USC_NEXUS_KEYSTORE_PASSWORD=default-password-QjX1ai
 export USC_SHARED_DIR_NFS=/mnt/docker/nfs
 export USC_SHARED_DIR=/mnt/docker/gluster
 export USC_LOCAL_DIR=/mnt/docker/disk2
+
+export USC_MOBILE_DATA_DIR=${USC_SHARED_DIR_NFS}/mobile/data
+export USC_MOBILE_DB_DIR=${USC_SHARED_DIR_NFS}/mobile/db
+export USC_MOBILE_SERVER_NAME=mobile.docker.usc.edu
 
 export NODE00=${HOSTNAME}
 export NODE01=${HOSTNAME}
