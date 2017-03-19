@@ -1,9 +1,7 @@
 version: '3.1'
 services:
-  mobile-wordpress:
-    image: wordpress
-    ports:
-      - ${USC_MOBILE_PORT}:80
+  mobile-setup:
+    image: uscits/mobile-setup
     depends_on:
       - mobile-db
     networks:
@@ -17,19 +15,12 @@ services:
         parallelism: 1
         delay: 10s
       restart_policy:
-        condition: on-failure
+        condition: none
     environment:
       - WORDPRESS_DB_PASSWORD=${USC_MOBILE_DB_PASSWORD}
       - WORDPRESS_DB_HOST=mobile-db
+      - USC_MOBILE_ADMIN_PASSWORD=${USC_MOBILE_ADMIN_PASSWORD}
       - ServerName=${USC_MOBILE_SERVER_NAME}
-  mobile-db:
-    image: mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: ${USC_MOBILE_DB_PASSWORD}
-    networks:
-      mobile-db:
-    volumes:
-      - mobile-db:/var/lib/mysql
 networks:
   mobile-db:
 #    driver: overlay

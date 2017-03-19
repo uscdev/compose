@@ -10,6 +10,8 @@ export USC_MOBILE_DB_PASSWORD=default-password-QjX1a
 export USC_WORDPRESS_DB_PASSWORD=default-password-QjX1ai
 export USC_T2_DB_PASSWORD=default-password-QjX1ai
 export USC_NEXUS_KEYSTORE_PASSWORD=default-password-QjX1ai
+export USC_MOBILE_PORT=8084
+export USC_MOBILE_ADMIN_PASSWORD=default-password-Th1UusmN
 . ${USC_SECRETS_DIR}/scripts/setsecrets.sh $1
 
 export USC_SHARED_DIR_NFS=/mnt/docker/nfs
@@ -18,6 +20,9 @@ export USC_LOCAL_DIR=/mnt/docker/disk2
 
 export USC_MOBILE_DATA_DIR=${USC_SHARED_DIR_NFS}/mobile/data
 export USC_MOBILE_DB_DIR=${USC_SHARED_DIR_NFS}/mobile/db
+export USC_MOBILE_DATA_DIR=mobile-data
+export USC_MOBILE_DB_DIR=mobile-db
+
 export USC_MOBILE_SERVER_NAME=mobile.docker.usc.edu
 
 export NODE00=${HOSTNAME}
@@ -46,4 +51,10 @@ if [ "$1" = "dev" ]; then
     export DOCKER_HOST=tcp://${NODE00}:2376
     export DOCKER_TLS_VERIFY=1
     export DOCKER_CERT_PATH=${USC_SECRETS_DIR}/keys/swarm-tls
+fi;
+if [ "$1" = "local" ]; then
+    export USC_MOBILE_PORT=80
+fi;
+if [ "$1" = "aws" ]; then
+    export USC_MOBILE_PORT=80
 fi;
