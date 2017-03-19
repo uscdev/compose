@@ -8,5 +8,4 @@ Deploy a Wordpress docker stack for the Mobile project
 4. Enable (Mobile) Theme
 
 Optional: Move the php.ini file from the Wordpress compose project
-to the wp-content directory
-to increase the file upload size.
+to the wp-content directory to increase the file upload size.
