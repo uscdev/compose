@@ -7,7 +7,7 @@ if [ "$1" = "aws" ]; then
         export USC_MOBILE_DB_PASSWORD=$DB_PASSWORD
     fi;
     export ServerName=mobile.usc.edu
-    if [ "$USC_MOBILE_DB_PASSWORD" = "" ]; then
+    if [ "$USC_MOBILE_ADMIN_PASSWORD" = "" ]; then
         echo "Enter the Wordpress admin password:"
         read ADMIN_PASSWORD
         export USC_MOBILE_ADMIN_PASSWORD=$ADMIN_PASSWORD
@@ -20,16 +20,23 @@ if [ "$1" = "aws" ]; then
         cd ..
     fi
 fi;
-echo done
-sleep 10
+
+echo Remove old environment
+
 docker stack rm mobile
-docker stack rm mobile-setup 
+docker stack rm mobile-setup
+sleep 5
+docker network create --driver overlay mobile-db
+docker network create --driver overlay web-bus
 # sudo rm -fr ${USC_SHARED_DIR_NFS}/mobile/data/*
 # sudo rm -fr ${USC_SHARED_DIR_NFS}/mobile/db/*
 docker volume rm mobile-db
 docker volume rm mobile-data
+
+echo Create new environment
+
 docker stack deploy --compose-file docker-compose.yml mobile
 cd setup/
-sleep 10
+sleep 30
 docker stack deploy --compose-file docker-compose-setup.yml mobile-setup
  
