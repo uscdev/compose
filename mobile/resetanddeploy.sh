@@ -33,7 +33,11 @@ docker volume rm mobile-data
 echo Create new environment
 
 docker stack deploy --compose-file docker-compose.yml mobile
-echo ...Please wait while environment is created
+echo ...Please wait while the environment is created
 sleep 60
 echo Importing content
 docker stack deploy --compose-file docker-compose-setup.yml mobile-setup
+echo ...Please wait while content is created
+sleep 60
+echo Done. Set the site: https://classic-mobile-lb-1348677779.us-west-2.elb.amazonaws.com
+echo Change route53 entry: https://mobile.usc.edu
