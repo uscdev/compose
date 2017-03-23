@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-if [ "$1" = "aws" ]; then
+if [ "$1" = "aws" ] || [ "$1" = "" ] ; then
     export USC_MOBILE_PORT=80
     if [ "$USC_MOBILE_DB_PASSWORD" = "" ]; then
         echo "Enter the database password:"
@@ -33,5 +33,7 @@ docker volume rm mobile-data
 echo Create new environment
 
 docker stack deploy --compose-file docker-compose.yml mobile
-sleep 30
+echo ...Please wait while environment is created
+sleep 60
+echo Importing content
 docker stack deploy --compose-file docker-compose-setup.yml mobile-setup
