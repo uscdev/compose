@@ -12,7 +12,7 @@ if [ "$1" = "aws" ] || [ "$1" = "" ] ; then
         read ADMIN_PASSWORD
         export USC_MOBILE_ADMIN_PASSWORD=$ADMIN_PASSWORD
     fi;
-    if [ ! -d "docker-compose.yml" ]; then
+    if [ ! -e "docker-compose.yml" ]; then
         curl -O https://raw.githubusercontent.com/usc-its/compose/master/mobile/docker-compose.yml
         curl -O https://raw.githubusercontent.com/usc-its/compose/master/mobile/docker-compose-setup.yml
     fi
@@ -34,10 +34,10 @@ echo Create new environment
 
 docker stack deploy --compose-file docker-compose.yml mobile
 echo ...Please wait while the environment is created
-sleep 60
+sleep 120
 echo Importing content
 docker stack deploy --compose-file docker-compose-setup.yml mobile-setup
 echo ...Please wait while content is created
-sleep 60
+sleep 100
 echo Done. Set the site: https://classic-mobile-lb-1348677779.us-west-2.elb.amazonaws.com
 echo Change route53 entry: https://mobile.usc.edu
