@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 if [ "$1" = "aws" ] || [ "$1" = "" ] ; then
-    export USC_MOBILE_PORT=80
+    if [ "$USC_MOBILE_PORT" = "" ]; then
+        export USC_MOBILE_PORT=80
+    fi
     if [ "$USC_MOBILE_DB_PASSWORD" = "" ]; then
         echo "Enter the database password:"
         read DB_PASSWORD

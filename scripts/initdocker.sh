@@ -12,6 +12,9 @@ export USC_T2_DB_PASSWORD=default-password-QjX1ai
 export USC_NEXUS_KEYSTORE_PASSWORD=default-password-QjX1ai
 export USC_MOBILE_PORT=8084
 export USC_MOBILE_ADMIN_PASSWORD=default-password-Th1UusmN
+if [ "$TZ" = "" ]; then
+  export TZ=America/Los_Angeles
+fi
 . ${USC_SECRETS_DIR}/scripts/setsecrets.sh $1
 
 export USC_SHARED_DIR_NFS=/mnt/docker/nfs
