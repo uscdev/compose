@@ -8,7 +8,9 @@ if [ "$1" = "aws" ] || [ "$1" = "" ] ; then
         read DB_PASSWORD
         export USC_MOBILE_DB_PASSWORD=$DB_PASSWORD
     fi;
-    export ServerName=mobile.usc.edu
+    if [ "$ServerName" = "" ]; then
+        export ServerName=mobile.usc.edu
+    fi
     if [ "$USC_MOBILE_ADMIN_PASSWORD" = "" ]; then
         echo "Enter the Wordpress admin password:"
         read ADMIN_PASSWORD
