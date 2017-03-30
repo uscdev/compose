@@ -1,0 +1,46 @@
+version: '3.1'
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      web-bus:
+    secrets:
+      - docker.usc.edu.key
+      - docker.usc.edu.cer
+      - ca.pem
+      - cert.pem
+      - key.pem
+#    volumes:
+#      - /var/run/docker.sock:/tmp/docker.sock:ro
+    environment:
+      - DOCKER_HOST=tcp://dcorley-swarm-mgr01.usc.edu:2376
+      - DOCKER_TLS_VERIFY=1
+      - DOCKER_CERT_PATH=/run/secrets
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role==manager
+networks:
+  web-bus:
+    external:
+      name: web-bus
+secrets:
+  docker.usc.edu.key:
+    external: true
+  docker.usc.edu.cer:
+    external: true
+  ca.pem:
+    external: true
+  cert.pem:
+    external: true
+  key.pem:
+    external: true
