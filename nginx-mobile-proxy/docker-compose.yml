@@ -1,0 +1,28 @@
+version: '3.1'
+services:
+  nginx-mobile-proxy:
+    image: uscits/nginx-mobile-proxy
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      web-bus:
+    secrets:
+      - mobile.usc.edu.key
+      - mobile.usc.edu.cer
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+networks:
+  web-bus:
+    external:
+      name: web-bus
+secrets:
+  mobile.usc.edu.key:
+    external: true
+  mobile.usc.edu.cer:
+    external: true

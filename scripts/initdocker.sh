@@ -6,12 +6,15 @@ if [ ! -d "/run/secrets" ]; then
 fi
 
 export USC_SECRETS_DIR=/run/secrets
-export USC_MOBILE_DB_PASSWORD=default-password-QjX1a
-export USC_WORDPRESS_DB_PASSWORD=default-password-QjX1ai
-export USC_T2_DB_PASSWORD=default-password-QjX1ai
-export USC_NEXUS_KEYSTORE_PASSWORD=default-password-QjX1ai
+export USC_DEFAULT_PASSWORD=do-not-use-JdYrCiCdWa
+export USC_MOBILE_DB_PASSWORD=$USC_DEFAULT_PASSWORD
+export USC_WORDPRESS_DB_PASSWORD=$USC_DEFAULT_PASSWORD
+export USC_T2_DB_PASSWORD=$USC_DEFAULT_PASSWORD
+export USC_NEXUS_KEYSTORE_PASSWORD=$USC_DEFAULT_PASSWORD
 export USC_MOBILE_PORT=8084
-export USC_MOBILE_ADMIN_PASSWORD=default-password-Th1UusmN
+export USC_MOBILE_ADMIN_PASSWORD=$USC_DEFAULT_PASSWORD
+export USC_NEXUS_PASSWORD=$USC_DEFAULT_PASSWORD
+export USC_APPLE_PASSWORD=$USC_DEFAULT_PASSWORD
 if [ "$TZ" = "" ]; then
   export TZ=America/Los_Angeles
 fi
