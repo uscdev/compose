@@ -1,8 +1,18 @@
 #!/bin/bash
 # Param 1: dev = swarm
 
+export USC_ENV=$1
+
+if [ "$USC_ENV" != "swarm" ] && [ "$USC_ENV" != "aws" ] && [ "$USC_ENV" != "local" ]; then
+  echo "Environment: [local], swarm, aws: "
+  read USC_ENV
+  if [ "$USC_ENV" != "swarm" ] && [ "$USC_ENV" != "aws" ]; then
+    export USC_ENV=local
+  fi
+fi
+
 if [ ! -d "/run/secrets" ]; then
-  ~/initsecrets.sh
+  ~/restoresecrets.sh $USC_ENV
 fi
 
 export USC_SECRETS_DIR=/run/secrets
@@ -18,7 +28,7 @@ export USC_APPLE_PASSWORD=$USC_DEFAULT_PASSWORD
 if [ "$TZ" = "" ]; then
   export TZ=America/Los_Angeles
 fi
-. ${USC_SECRETS_DIR}/scripts/setsecrets.sh $1
+. ${USC_SECRETS_DIR}/scripts/setsecrets.sh $USC_ENV
 
 export USC_SHARED_DIR_NFS=/mnt/docker/nfs
 export USC_SHARED_DIR=/mnt/docker/gluster
