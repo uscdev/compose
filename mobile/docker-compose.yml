@@ -2,8 +2,8 @@ version: '3.1'
 services:
   mobile-wordpress:
     image: wordpress
-#    ports:
-#      - ${USC_MOBILE_PORT}:80
+    ports:
+      - ${USC_MOBILE_PORT}:80
     depends_on:
       - mobile-db
     networks:
