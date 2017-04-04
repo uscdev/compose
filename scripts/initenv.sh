@@ -58,7 +58,7 @@ chmod a+rw ${USC_LOCAL_DIR}/nexus
 unset DOCKER_HOST
 unset DOCKER_TLS_VERIFY
 unset DOCKER_CERT_PATH
-if [ "$1" = "dev" ]; then
+if [ "$1" = "swarm" ]; then
     export NODE00=dcorley-swarm-mgr01.usc.edu
     export NODE01=dcorley-swarm-node01.usc.edu
     export NODE02=dcorley-swarm-node02.usc.edu
