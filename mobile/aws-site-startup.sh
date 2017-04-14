@@ -6,7 +6,7 @@ aws elb register-instances-with-load-balancer --load-balancer-name mobile-usc-ed
 
 export PublicDns=$(aws ec2 describe-instances --instance-ids i-0ef26d315324ffce2 --query Reservations[0].Instances[0].PublicDnsName --output text)
 
-ssh -i /run/secrets/its-bsa-prod-us-west-1-key-pair.pem -o StrictHostKeyChecking=no docker@$PublicDns "curl -O https://raw.githubusercontent.com/usc-its/compose/master/mobile/resetanddeploy.sh"
+ssh -i /run/secrets/its-bsa-prod-us-west-1-key-pair.pem docker@$PublicDns "curl -O https://raw.githubusercontent.com/usc-its/compose/master/mobile/resetanddeploy.sh"
 
 ssh -i /run/secrets/its-bsa-prod-us-west-1-key-pair.pem docker@$PublicDns "chmod a+x resetanddeploy.sh"
 
