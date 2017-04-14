@@ -4,11 +4,13 @@ sleep 5
 
 aws elb register-instances-with-load-balancer --load-balancer-name mobile-usc-edu-load-balancer --instances i-0ef26d315324ffce2
 
-ssh -i /run/secrets/its-bsa-prod-us-west-1-key-pair.pem docker@ec2-54-183-138-242.us-west-1.compute.amazonaws.com "curl -O https://raw.githubusercontent.com/usc-its/compose/master/mobile/resetanddeploy.sh"
+export PublicDns=$(aws ec2 describe-instances --instance-ids i-0ef26d315324ffce2 --query Reservations[0].Instances[0].PublicDnsName --output text)
 
-ssh -i /run/secrets/its-bsa-prod-us-west-1-key-pair.pem docker@ec2-54-183-138-242.us-west-1.compute.amazonaws.com "chmod a+x resetanddeploy.sh"
+ssh -i /run/secrets/its-bsa-prod-us-west-1-key-pair.pem -o StrictHostKeyChecking=no docker@$PublicDns "curl -O https://raw.githubusercontent.com/usc-its/compose/master/mobile/resetanddeploy.sh"
 
-ssh -i /run/secrets/its-bsa-prod-us-west-1-key-pair.pem docker@ec2-54-183-138-242.us-west-1.compute.amazonaws.com "./resetanddeploy.sh --stdin uscits"
+ssh -i /run/secrets/its-bsa-prod-us-west-1-key-pair.pem docker@$PublicDns "chmod a+x resetanddeploy.sh"
+
+ssh -i /run/secrets/its-bsa-prod-us-west-1-key-pair.pem docker@$PublicDns "./resetanddeploy.sh --stdin uscits"
 
 
 if [ "$UPDATE_ROUTE_53" = true ]; then
