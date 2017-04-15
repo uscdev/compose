@@ -1,0 +1,18 @@
+{
+  "Comment": "This is an Update",
+  "Changes": [
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "crekhi.usc.edu",
+        "Type": "A",
+        "AliasTarget": {
+          "HostedZoneId": "Z368ELLRRE2KJ0",
+          "DNSName": "dualstack.crekhi-test-load-balancer-832023391.us-west-1.elb.amazonaws.com",
+          "EvaluateTargetHealth": false
+        }
+      }
+    }
+       
+  ]
+}
