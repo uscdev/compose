@@ -23,7 +23,7 @@ services:
       - WORDPRESS_DB_HOST=mobile-db
       - ServerName=${USC_MOBILE_SERVER_NAME}
   mobile-db:
-    image: mysql
+    image: mysql:8
     environment:
       MYSQL_ROOT_PASSWORD: ${USC_MOBILE_DB_PASSWORD}
     networks:
