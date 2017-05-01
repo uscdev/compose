@@ -2,8 +2,8 @@ version: '3.1'
 services:
   wordpress:
     image: wordpress
-#    ports:
-#      - 8098:80
+    ports:
+      - 8098:80
     depends_on:
       - db
     networks:
@@ -12,7 +12,7 @@ services:
     volumes:
       - ${USC_SHARED_DIR_NFS}/wordpress/data:/var/www/html
     deploy:
-      replicas: 2
+      replicas: 1
       update_config:
         parallelism: 1
         delay: 10s
