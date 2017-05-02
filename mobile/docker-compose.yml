@@ -23,7 +23,7 @@ services:
       - WORDPRESS_DB_HOST=mobile-db
       - ServerName=${USC_MOBILE_SERVER_NAME}
   mobile-db:
-    image: mysql:8
+    image: mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${USC_MOBILE_DB_PASSWORD}
     networks:
@@ -35,9 +35,9 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
-#      placement:
-#        constraints:
-#          - node.hostname==${NODE00}
+      placement:
+        constraints:
+          - node.hostname==${NODE01}
     volumes:
       - mobile-db:/var/lib/mysql
 networks:
