@@ -1,0 +1,36 @@
+version: '3.1'
+services:
+  ssl-proxy:
+    image: uscdev/ssl-proxy
+    ports:
+#      - 80:80
+#      - 443:443
+      - 8000:443
+    networks:
+      web-bus:
+    secrets:
+      - docker.usc.edu.key
+      - docker.usc.edu.cer
+    deploy:
+      labels:
+        - "traefik.port=80"
+        - "traefik.port=443"
+#        - "traefik.protocol=https"
+        - "traefik.backend=ssl-proxy"
+        - "traefik.frontend.rule=Host:ssl-proxy.docker.usc.edu"
+        - "traefik.frontend.entryPoints=http,https"
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+networks:
+  web-bus:
+    external:
+      name: web-bus
+secrets:
+  docker.usc.edu.key:
+    external: true
+  docker.usc.edu.cer:
+    external: true

@@ -66,7 +66,7 @@ if [ "$1" = "swarm" ]; then
 
     export DOCKER_HOST=tcp://${NODE00}:2376
     export DOCKER_TLS_VERIFY=1
-    export DOCKER_CERT_PATH=${USC_SECRETS_DIR}/certificates/docker/swarm-tls
+    export DOCKER_CERT_PATH=${USC_SECRETS_DIR}/certificates/docker/$NODE00/client-tls
 fi;
 if [ "$1" = "local" ]; then
     export USC_MOBILE_PORT=80

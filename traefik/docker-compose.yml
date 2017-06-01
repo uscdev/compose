@@ -1,0 +1,55 @@
+version: '3.1'
+services:
+  traefik:
+    image: traefik
+    command:
+        - --DefaultEntryPoints=http,https
+#        - --EntryPoints=Name:http Address::80 Redirect.EntryPoint:https
+        - --EntryPoints=Name:http Address::80
+        - --EntryPoints=Name:https Address::443
+        - --Docker
+        - --Docker.Watch
+        - --docker.swarmmode
+        - --docker.domain=usc.edu
+        - --logLevel=DEBUG
+        - --web
+        - --web.readonly=true # Being safe
+        - --web.statistics=true
+#        - --web.address=80
+#        - --web.path=/web
+#        - --Docker.EndPoint=http://dockersocket:2375
+#        - --Docker.ExposedByDefault=false
+#    command: ['--docker', '--docker.swarmmode', '--docker.domain=docker.usc.edu', '--docker.watch', '--logLevel=DEBUG', '--web']
+#    --entryPoints='Name:http Address::80 Redirect.EntryPoint:https'
+#    --entryPoints='Name:https Address::442 TLS:tests/traefik.crt,tests/traefik.key;prod/traefik.crt,prod/traefik.key'
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    networks:
+      web-bus:
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+#      - /home/dcorley/workspace/github/uscdev/compose/traefik/etc/traefik/traefik.toml:/etc/traefik/traefik.toml
+#    secrets:
+#      - docker.usc.edu.key
+#      - docker.usc.edu.cer
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role==manager
+networks:
+  web-bus:
+    external:
+      name: web-bus
+#secrets:
+#  docker.usc.edu.key:
+#    external: true
+#  docker.usc.edu.cer:
+#    external: true
