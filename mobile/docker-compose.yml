@@ -7,7 +7,7 @@ services:
     depends_on:
       - mobile-db
     networks:
-      web-bus:
+      proxy:
       mobile-db:
     volumes:
       - mobile-data:/var/www/html
@@ -41,9 +41,9 @@ services:
     volumes:
       - mobile-db:/var/lib/mysql
 networks:
-  web-bus:
+  proxy:
     external:
-      name: web-bus
+      name: proxy
   mobile-db:
 #    driver: overlay
     external:

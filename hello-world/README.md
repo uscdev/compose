@@ -1,3 +1,10 @@
+# hello-world
+Docker Flow Proxy Example
+
+This dockerfile builds an automatic reverse-proxy
+
+Check out the hello-world program for a configuration example:
+````bash
 version: '3.1'
 
 services:
@@ -15,3 +22,5 @@ services:
 networks:
   proxy:
     external: true
+
+````
