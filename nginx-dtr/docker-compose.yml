@@ -1,0 +1,34 @@
+version: '3.1'
+services:
+  nginx-dtr:
+    image: uscdev/nginx-dtr
+#    ports:
+#      - 8443:8443
+    networks:
+      - proxy
+    secrets:
+      - docker.usc.edu.key
+      - docker.usc.edu.cer
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.httpsOnly=true
+        - com.df.port=8442
+        - com.df.serviceDomain=dtr.docker.usc.edu
+        - com.df.sslVerifyNone=true
+networks:
+  proxy:
+    external:
+      name: proxy
+secrets:
+  docker.usc.edu.key:
+    external: true
+  docker.usc.edu.cer:
+    external: true
