@@ -1,12 +1,12 @@
 version: '3.1'
 services:
   mobile-setup:
-    image: uscits/mobile-setup
+    image: uscdev/mobile-setup
     depends_on:
       - mobile-db
     networks:
-      mobile-db:
-      web-bus:
+      - mobile-db
+      - web-bus
     volumes:
       - mobile-data:/var/www/html
     deploy:
@@ -16,9 +16,9 @@ services:
         delay: 10s
       restart_policy:
         condition: none
-#      placement:
-#        constraints:
-#          - node.hostname==${NODE00}
+      placement:
+        constraints:
+          - node.hostname==${NODE00}
     environment:
       - WORDPRESS_DB_PASSWORD=${USC_MOBILE_DB_PASSWORD}
       - WORDPRESS_DB_HOST=mobile-db

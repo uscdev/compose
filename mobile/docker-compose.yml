@@ -7,17 +7,27 @@ services:
     depends_on:
       - mobile-db
     networks:
-      proxy:
-      mobile-db:
+      - proxy
+      - mobile-db
     volumes:
       - mobile-data:/var/www/html
     deploy:
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.serviceDomain=mobile.docker.usc.edu
+        - com.df.port=80
+        - com.df.xForwardedProto=true
+        - com.df.httpsOnly=true
       replicas: 1
       update_config:
         parallelism: 1
         delay: 10s
       restart_policy:
         condition: on-failure
+      placement:
+        constraints:
+          - node.hostname==${NODE00}
     environment:
       - WORDPRESS_DB_PASSWORD=${USC_MOBILE_DB_PASSWORD}
       - WORDPRESS_DB_HOST=mobile-db
@@ -27,7 +37,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${USC_MOBILE_DB_PASSWORD}
     networks:
-      mobile-db:
+      - mobile-db
     deploy:
       replicas: 1
       update_config:
@@ -37,17 +47,17 @@ services:
         condition: on-failure
       placement:
         constraints:
-          - node.hostname==${NODE01}
+          - node.hostname==${NODE00}
     volumes:
       - mobile-db:/var/lib/mysql
 networks:
-  proxy:
-    external:
-      name: proxy
   mobile-db:
 #    driver: overlay
     external:
       name: mobile-db
+  proxy:
+    external:
+      name: proxy
 volumes:
   mobile-db:
     external:

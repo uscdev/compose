@@ -3,15 +3,22 @@ services:
   wordpress:
     image: wordpress
     ports:
-      - 8098:80
+      - 8101:80
     depends_on:
       - db
     networks:
-      wordpress-db:
-      web-bus:
+      - wordpress-db
+      - proxy
     volumes:
       - ${USC_SHARED_DIR_NFS}/wordpress/data:/var/www/html
     deploy:
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.port=80
+        - com.df.xForwardedProto=true
+        - com.df.httpsOnly=true
+        - com.df.serviceDomain=wordpress.docker.usc.edu
       replicas: 1
       update_config:
         parallelism: 1
@@ -27,12 +34,12 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${USC_WORDPRESS_DB_PASSWORD}
     networks:
-      wordpress-db:
+      - wordpress-db
     volumes:
       - ${USC_SHARED_DIR_NFS}/wordpress/db:/var/lib/mysql
 networks:
   wordpress-db:
     driver: overlay
-  web-bus:
+  proxy:
     external:
-      name: web-bus
+      name: proxy

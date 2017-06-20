@@ -17,11 +17,12 @@ if [ "$1" = "aws" ] || [ "$1" = "" ] ; then
         export USC_MOBILE_ADMIN_PASSWORD=$ADMIN_PASSWORD
     fi;
     if [ "$NODE01" = "" ]; then
+        export NODE00=${HOSTNAME}
         export NODE01=${HOSTNAME}
     fi;
     if [ ! -e "docker-compose.yml" ]; then
-        curl -O https://raw.githubusercontent.com/usc-its/compose/master/mobile/docker-compose.yml
-        curl -O https://raw.githubusercontent.com/usc-its/compose/master/mobile/docker-compose-setup.yml
+        curl -O https://raw.githubusercontent.com/uscdev/compose/master/mobile/docker-compose.yml
+        curl -O https://raw.githubusercontent.com/uscdev/compose/master/mobile/docker-compose-setup.yml
     fi
 fi;
 

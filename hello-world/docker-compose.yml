@@ -12,6 +12,7 @@ services:
         - com.df.distribute=true
         - com.df.serviceDomain=hello-world.docker.usc.edu
         - com.df.port=80
+        - com.df.httpsOnly=true
 networks:
   proxy:
     external: true
