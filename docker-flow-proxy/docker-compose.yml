@@ -3,7 +3,7 @@ version: "3.1"
 services:
 
   proxy:
-    image: vfarcic/docker-flow-proxy
+    image: uscdev/docker-flow-proxy
     ports:
       - 80:80
       - 443:443
@@ -16,6 +16,8 @@ services:
       replicas: 1
     secrets:
       - cert-docker.usc.edu.pem
+      - cert-emailchoice.usc.edu.pem
+      - cert-workday-account-translator.usc.edu.pem
 
   swarm-listener:
     image: vfarcic/docker-flow-swarm-listener
@@ -36,4 +38,8 @@ networks:
       name: proxy
 secrets:
   cert-docker.usc.edu.pem:
+    external: true
+  cert-emailchoice.usc.edu.pem:
+    external: true
+  cert-workday-account-translator.usc.edu.pem:
     external: true
