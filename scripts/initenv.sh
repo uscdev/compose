@@ -3,10 +3,10 @@
 
 export USC_ENV=$1
 
-if [ "$USC_ENV" != "swarm" ] && [ "$USC_ENV" != "aws" ] && [ "$USC_ENV" != "local" ]; then
-  echo "Environment: [local], swarm, aws: "
+if [ "$USC_ENV" != "swarm" ] && [ "$USC_ENV" != "dcorley-swarm-mgr01" ] && [ "$USC_ENV" != "swarm" ] && [ "$USC_ENV" != "swarm-test" ] && [ "$USC_ENV" != "docker" ] && [ "$USC_ENV" != "cloud" ] && [ "$USC_ENV" != "aws" ]; then
+  echo "Environment: [local], dcorley-swarm-mgr01, swarm, swarm-test, cloud, aws: "
   read USC_ENV
-  if [ "$USC_ENV" != "swarm" ] && [ "$USC_ENV" != "aws" ]; then
+  if [ "$USC_ENV" != "swarm" ] && [ "$USC_ENV" != "dcorley-swarm-mgr01" ] && [ "$USC_ENV" != "swarm" ] && [ "$USC_ENV" != "swarm-test" ] && [ "$USC_ENV" != "docker" ] && [ "$USC_ENV" != "cloud" ] && [ "$USC_ENV" != "aws" ]; then
     export USC_ENV=local
   fi
 fi
@@ -58,15 +58,23 @@ chmod a+rw ${USC_LOCAL_DIR}/nexus
 unset DOCKER_HOST
 unset DOCKER_TLS_VERIFY
 unset DOCKER_CERT_PATH
-if [ "$1" = "swarm" ]; then
+if [ "$1" = "dcorley-swarm-mgr01" ]; then
     export NODE00=dcorley-swarm-mgr01.usc.edu
     export NODE01=dcorley-swarm-node01.usc.edu
     export NODE02=dcorley-swarm-node02.usc.edu
     export NODE03=dcorley-swarm-node03.usc.edu
-
-    export DOCKER_HOST=tcp://${NODE00}:2376
-    export DOCKER_TLS_VERIFY=1
-    export DOCKER_CERT_PATH=${USC_SECRETS_DIR}/certificates/docker/$NODE00/client-certs
+fi;
+if [ "$1" = "swarm-test" ]; then
+    export NODE00=swarm-test1.usc.edu
+    export NODE01=swarm-test1.usc.edu
+    export NODE02=swarm-test2.usc.edu
+    export NODE03=swarm-test3.usc.edu
+fi;
+if [ "$1" = "dcorley-swarm-mgr01" ]; then
+    export NODE00=dcorley-swarm-mgr01.usc.edu
+    export NODE01=dcorley-swarm-node01.usc.edu
+    export NODE02=dcorley-swarm-node02.usc.edu
+    export NODE03=dcorley-swarm-node03.usc.edu
 fi;
 if [ "$1" = "local" ]; then
     export USC_MOBILE_PORT=80
@@ -74,3 +82,8 @@ fi;
 if [ "$1" = "aws" ]; then
     export USC_MOBILE_PORT=80
 fi;
+
+export DOCKER_HOST=tcp://${NODE00}:2376
+export DOCKER_TLS_VERIFY=1
+export DOCKER_CERT_PATH=${USC_SECRETS_DIR}/certificates/docker/$NODE00/client-certs
+
