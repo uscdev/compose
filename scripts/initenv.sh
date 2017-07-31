@@ -3,10 +3,10 @@
 
 export USC_ENV=$1
 
-if [ "$USC_ENV" != "swarm" ] && [ "$USC_ENV" != "dcorley-swarm-mgr01" ] && [ "$USC_ENV" != "swarm" ] && [ "$USC_ENV" != "swarm-test" ] && [ "$USC_ENV" != "docker" ] && [ "$USC_ENV" != "cloud" ] && [ "$USC_ENV" != "aws" ]; then
-  echo "Environment: [local], dcorley-swarm-mgr01, swarm, swarm-test, cloud, aws: "
+if [ "$USC_ENV" != "dcorley-swarm.usc.edu" ] && [ "$USC_ENV" != "swarm-test.usc.edu" ] && [ "$USC_ENV" != "emailchoice.usc.edu" ] && [ "$USC_ENV" != "swarm.usc.edu" ] && [ "$USC_ENV" != "docker.usc.edu" ] && [ "$USC_ENV" != "cloud.usc.edu" ] && [ "$USC_ENV" != "aws" ]; then
+  echo "Environment: [local], dcorley-swarm.usc.edu, swarm-test, emailchoice.usc.edu, cloud, aws: "
   read USC_ENV
-  if [ "$USC_ENV" != "swarm" ] && [ "$USC_ENV" != "dcorley-swarm-mgr01" ] && [ "$USC_ENV" != "swarm" ] && [ "$USC_ENV" != "swarm-test" ] && [ "$USC_ENV" != "docker" ] && [ "$USC_ENV" != "cloud" ] && [ "$USC_ENV" != "aws" ]; then
+  if [ "$USC_ENV" != "dcorley-swarm.usc.edu" ] && [ "$USC_ENV" != "swarm-test.usc.edu" ] && [ "$USC_ENV" != "emailchoice.usc.edu" ] && [ "$USC_ENV" != "swarm.usc.edu" ] && [ "$USC_ENV" != "docker.usc.edu" ] && [ "$USC_ENV" != "cloud.usc.edu" ] && [ "$USC_ENV" != "aws" ]; then
     export USC_ENV=local
   fi
 fi
@@ -58,23 +58,29 @@ chmod a+rw ${USC_LOCAL_DIR}/nexus
 unset DOCKER_HOST
 unset DOCKER_TLS_VERIFY
 unset DOCKER_CERT_PATH
-if [ "$1" = "dcorley-swarm-mgr01" ]; then
+if [ "$1" = "dcorley-swarm.usc.edu" ]; then
     export NODE00=dcorley-swarm-mgr01.usc.edu
     export NODE01=dcorley-swarm-node01.usc.edu
     export NODE02=dcorley-swarm-node02.usc.edu
     export NODE03=dcorley-swarm-node03.usc.edu
 fi;
-if [ "$1" = "swarm-test" ]; then
+if [ "$1" = "swarm-test.usc.edu" ]; then
     export NODE00=swarm-test1.usc.edu
     export NODE01=swarm-test1.usc.edu
     export NODE02=swarm-test2.usc.edu
     export NODE03=swarm-test3.usc.edu
 fi;
-if [ "$1" = "dcorley-swarm-mgr01" ]; then
-    export NODE00=dcorley-swarm-mgr01.usc.edu
-    export NODE01=dcorley-swarm-node01.usc.edu
-    export NODE02=dcorley-swarm-node02.usc.edu
-    export NODE03=dcorley-swarm-node03.usc.edu
+if [ "$1" = "swarm.usc.edu" ]; then
+    export NODE00=swarm.usc.edu
+    export NODE01=swarm.usc.edu
+    export NODE02=swarm.usc.edu
+    export NODE03=swarm.usc.edu
+fi;
+if [ "$1" = "emailchoice.usc.edu" ]; then
+    export NODE00=emailchoice-prod-node1.usc.edu
+    export NODE01=emailchoice-prod-node1.usc.edu
+    export NODE02=emailchoice-prod-node2.usc.edu
+    export NODE03=emailchoice-prod-node3.usc.edu
 fi;
 if [ "$1" = "local" ]; then
     export USC_MOBILE_PORT=80
@@ -85,5 +91,5 @@ fi;
 
 export DOCKER_HOST=tcp://${NODE00}:2376
 export DOCKER_TLS_VERIFY=1
-export DOCKER_CERT_PATH=${USC_SECRETS_DIR}/certificates/docker/$NODE00/client-certs
+export DOCKER_CERT_PATH=${USC_SECRETS_DIR}/certificates/docker/$USC_ENV/client-certs
 
