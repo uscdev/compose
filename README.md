@@ -19,6 +19,6 @@ docker network create --driver overlay proxy
 
 docker stack deploy --compose-file docker-compose.yml docker-flow-proxy
 
-docker volume create -d "cloudstor:aws" --opt backing=shared mysharedvol1
+docker volume create -d "cloudstor:aws" --opt backing=shared wordpress-data
 
 docker stack deploy --compose-file docker-compose.yml wordpress
