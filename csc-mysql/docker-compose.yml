@@ -1,0 +1,20 @@
+version: '3.1'
+services:
+  csc-mysql:
+    image: mysql
+    ports:
+      - 3308:3306
+    volumes:
+      - ${USC_LOCAL_DIR}/wd-mysql:/var/lib/mysql
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname==${NODE03}
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DOCKER_WD_MYSQL_PASSWORD}
