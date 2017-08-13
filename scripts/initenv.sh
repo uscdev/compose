@@ -4,7 +4,7 @@
 export USC_ENV=$1
 
 if [ "$USC_ENV" != "dcorley-swarm.usc.edu" ] && [ "$USC_ENV" != "swarm-test.usc.edu" ] && [ "$USC_ENV" != "emailchoice.usc.edu" ] && [ "$USC_ENV" != "swarm.usc.edu" ] && [ "$USC_ENV" != "docker.usc.edu" ] && [ "$USC_ENV" != "cloud.usc.edu" ] && [ "$USC_ENV" != "aws" ]; then
-  echo "Environment: [local], dcorley-swarm.usc.edu, swarm-test, emailchoice.usc.edu, cloud, aws: "
+  echo "Environment: [local], dcorley-swarm.usc.edu, swarm-test.usc.edu, emailchoice.usc.edu, swarm.usc.edu, docker.usc.edu, cloud.usc.edu, aws: "
   read USC_ENV
   if [ "$USC_ENV" != "dcorley-swarm.usc.edu" ] && [ "$USC_ENV" != "swarm-test.usc.edu" ] && [ "$USC_ENV" != "emailchoice.usc.edu" ] && [ "$USC_ENV" != "swarm.usc.edu" ] && [ "$USC_ENV" != "docker.usc.edu" ] && [ "$USC_ENV" != "cloud.usc.edu" ] && [ "$USC_ENV" != "aws" ]; then
     export USC_ENV=local
@@ -82,14 +82,21 @@ if [ "$1" = "emailchoice.usc.edu" ]; then
     export NODE02=emailchoice-prod-node2.usc.edu
     export NODE03=emailchoice-prod-node3.usc.edu
 fi;
-if [ "$1" = "local" ]; then
-    export USC_MOBILE_PORT=80
-fi;
-if [ "$1" = "aws" ]; then
-    export USC_MOBILE_PORT=80
-fi;
 
 export DOCKER_HOST=tcp://${NODE00}:2376
 export DOCKER_TLS_VERIFY=1
 export DOCKER_CERT_PATH=${USC_SECRETS_DIR}/certificates/docker/$USC_ENV/client-certs
+
+if [ "$1" = "local" ]; then
+    export USC_MOBILE_PORT=80
+    unset DOCKER_HOST
+    unset DOCKER_TLS_VERIFY
+    unset DOCKER_CERT_PATH
+fi;
+if [ "$1" = "aws" ]; then
+    export USC_MOBILE_PORT=80
+    export DOCKER_HOST=:2374
+    unset DOCKER_TLS_VERIFY
+    unset DOCKER_CERT_PATH
+fi;
 
