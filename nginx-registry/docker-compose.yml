@@ -7,8 +7,8 @@ services:
     networks:
       - proxy
     secrets:
-      - docker.usc.edu.key
-      - docker.usc.edu.cer
+      - swarm.usc.edu.key
+      - swarm.usc.edu.cer
     deploy:
       replicas: 1
       update_config:
@@ -21,14 +21,14 @@ services:
         - com.df.distribute=true
         - com.df.httpsOnly=true
         - com.df.port=8445
-        - com.df.serviceDomain=registry.docker.usc.edu
+        - com.df.serviceDomain=registry.swarm.usc.edu
         - com.df.sslVerifyNone=true
 networks:
   proxy:
     external:
       name: proxy
 secrets:
-  docker.usc.edu.key:
+  swarm.usc.edu.key:
     external: true
-  docker.usc.edu.cer:
+  swarm.usc.edu.cer:
     external: true
