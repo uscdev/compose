@@ -16,8 +16,8 @@ services:
       replicas: 1
     secrets:
       - cert-swarm.usc.edu.pem
-#      - cert-emailchoice.usc.edu.pem
-#      - cert-workday-account-translator.usc.edu.pem
+      - cert-emailchoice.usc.edu.pem
+      - cert-workday-account-translator.usc.edu.pem
 
   swarm-listener:
     image: vfarcic/docker-flow-swarm-listener

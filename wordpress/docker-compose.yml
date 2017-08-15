@@ -1,9 +1,9 @@
 version: '3.2'
 services:
   wordpress:
-    image: wordpress:4.8.0
-    ports:
-      - 8101:80
+    image: wordpress:4.8.1
+#    ports:
+#      - 8101:80
     depends_on:
       - db
     networks:
@@ -52,7 +52,7 @@ volumes:
 #      name: db-data
 #      source: {{.Service.Name}}-{{.Task.Slot}}-vol
 #    target: /mydata
-#    driver_opts: 
+#    driver_opts:
 #      size: 25
 #      backing: relocatable
 #      ebstype: gp2
