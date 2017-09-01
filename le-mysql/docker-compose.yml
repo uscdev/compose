@@ -1,0 +1,20 @@
+version: '3.1'
+services:
+  le-mysql:
+    image: mysql
+    ports:
+      - 3309:3306
+    volumes:
+      - ${USC_LOCAL_DIR}/le-mysql:/var/lib/mysql
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname==${NODE03}
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DOCKER_WD_MYSQL_PASSWORD}
