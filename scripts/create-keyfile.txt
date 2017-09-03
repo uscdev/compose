@@ -1,4 +1,0 @@
-sudo cat cert/swarm_usc_edu.cer cert/swarm_usc_edu_interm.cer > cert-chain.cer
-openssl pkcs12 -info -in jetty.pkcs12
-sudo keytool -importkeystore -srckeystore swarm.usc.edu.pkcs12 -srcstoretype PKCS12 -destkeystore keystore.jks
-keytool -list --keystore keystore.jks
