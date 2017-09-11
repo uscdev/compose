@@ -1,0 +1,6 @@
+version: '3.2'
+
+services:
+  hello-world:
+    image: tutum/hello-world
+    ports: 8080:80
