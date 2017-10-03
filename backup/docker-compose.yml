@@ -1,1 +1,22 @@
-docker run --rm --volumes-from dbstore -v $(pwd):/backup ubuntu tar cvf /backup/backup.tar /dbdata
+version: '3.2'
+services:
+  jenkins:
+    image: osixia/backup
+#    environment:
+#      - BACKUP_CRON_EXP=30 * * * *
+    volumes:
+      - jenkins-backup:/data/backup
+      - jenkins-data:/data/input
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+volumes:
+  jenkins-data:
+    external: true
+  jenkins-backup:
+    external: true
+
