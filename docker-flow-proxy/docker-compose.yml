@@ -20,7 +20,7 @@ services:
       - cert-cloud.usc.edu.pem
       - cert-emailchoice.usc.edu.pem
       - cert-workday-account-translator.usc.edu.pem
-
+      - cert-itapps.usc.edu.pem
   swarm-listener:
     image: vfarcic/docker-flow-swarm-listener
     networks:
@@ -44,4 +44,6 @@ secrets:
   cert-emailchoice.usc.edu.pem:
     external: true
   cert-workday-account-translator.usc.edu.pem:
+    external: true
+  cert-itapps.usc.edu.pem:
     external: true
