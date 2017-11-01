@@ -1,4 +1,4 @@
-version: '3.2'
+version: '3.4'
 services:
   wordpress:
     image: wordpress:4.8.1
@@ -46,6 +46,11 @@ networks:
 volumes:
   wordpress-db:
     driver: cloudstor:aws
+    driver_opts:
+      ebstype: io1
+      size: 25
+      iops: 1000
+      backing: relocatable
   wordpress-data:
     external: true
 #    external:
