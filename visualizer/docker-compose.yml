@@ -12,7 +12,7 @@ services:
         - com.df.distribute=true
         - com.df.httpsOnly=true
         - com.df.port=8080
-        - com.df.serviceDomain=visualizer.docker.usc.edu
+        - com.df.serviceDomain=visualizer.swarm.usc.edu
       placement:
         constraints: [node.role == manager]
     volumes:
