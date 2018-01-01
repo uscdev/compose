@@ -44,6 +44,16 @@ services:
     depends_on:
       - elasticsearch
 
+  logspout:
+    image: gliderlabs/logspout
+#    command: syslog://logstash:51415
+    networks:
+      - elk
+#    mode 
+#      - global
+#    --mount "type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock"
+#    -e SYSLOG_FORMAT=rfc3164 \
+
 networks:
 
   elk:
