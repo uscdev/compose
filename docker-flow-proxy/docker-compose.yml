@@ -36,7 +36,8 @@ services:
 
 networks:
   proxy:
-    name: proxy
+    external:
+      name: proxy
 secrets:
   cert-docker.usc.edu.pem:
     external: true
