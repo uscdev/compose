@@ -10,7 +10,7 @@ services:
       - wordpress-db
       - proxy
     volumes:
-      - ${USC_SHARED_DIR_NFS}/wordpress/data:/var/www/html
+      - wordpress-data:/var/www/html
     deploy:
       labels:
         - com.df.notify=true
@@ -18,17 +18,20 @@ services:
         - com.df.port=80
         - com.df.xForwardedProto=true
         - com.df.httpsOnly=true
-        - com.df.serviceDomain=wordpress.docker.usc.edu
+        - com.df.serviceDomain=wordpress.poc.usc.edu
       replicas: 1
       update_config:
         parallelism: 1
         delay: 10s
       restart_policy:
         condition: on-failure
+      placement:
+        constraints:
+          - node.hostname==${NODE00}
     environment:
       - WORDPRESS_DB_PASSWORD=${USC_WORDPRESS_DB_PASSWORD}
       - WORDPRESS_DB_HOST=db
-      - ServerName=wordpress.docker.usc.edu
+      - ServerName=wordpress.poc.usc.edu
   db:
     image: mysql
     environment:
@@ -36,10 +39,23 @@ services:
     networks:
       - wordpress-db
     volumes:
-      - ${USC_SHARED_DIR_NFS}/wordpress/db:/var/lib/mysql
+      - wordpress-db:/var/lib/mysql
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname==${NODE00}
 networks:
   wordpress-db:
     driver: overlay
   proxy:
     external:
       name: proxy
+volumes:
+  wordpress-data:
+  wordpress-db:
