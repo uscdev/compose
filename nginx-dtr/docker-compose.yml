@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.5'
 services:
   nginx-dtr:
     image: uscdev/nginx-dtr
@@ -25,8 +25,7 @@ services:
         - com.df.sslVerifyNone=true
 networks:
   proxy:
-    external:
-      name: proxy
+    external: true
 secrets:
   docker.usc.edu.key:
     external: true
