@@ -36,8 +36,7 @@ services:
 
 networks:
   proxy:
-    external:
-      name: proxy
+    external: true
 secrets:
   cert-swarm.usc.edu.pem:
     external: true
