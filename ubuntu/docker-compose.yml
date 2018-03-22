@@ -6,7 +6,7 @@ services:
     networks:
       - proxy
     volumes:
-      - ubuntu-data:/var/lib/ubuntu-data
+      - jenkins-backup:/var/lib/jenkins-backup
     command: sleep 36000
     deploy:
       replicas: 1
@@ -25,8 +25,7 @@ services:
         constraints:
           - node.hostname==${NODE00}
 volumes:
-  ubuntu-data:
+  jenkins-backup:
 networks:
   proxy:
     external: true
-
