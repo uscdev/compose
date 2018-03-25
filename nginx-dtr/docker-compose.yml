@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.5'
 services:
   nginx-dtr:
     image: uscdev/nginx-dtr:swarm-1.0.0
@@ -25,8 +25,7 @@ services:
         - com.df.sslVerifyNone=true
 networks:
   proxy:
-    external:
-      name: proxy
+    external: true
 secrets:
   swarm.usc.edu.key:
     external: true

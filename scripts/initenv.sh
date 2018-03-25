@@ -3,10 +3,10 @@
 
 export USC_ENV=$1
 
-if [ "$USC_ENV" != "dcorley-swarm.usc.edu" ] && [ "$USC_ENV" != "swarm-test.usc.edu" ] && [ "$USC_ENV" != "emailchoice.usc.edu" ] && [ "$USC_ENV" != "swarm.usc.edu" ] && [ "$USC_ENV" != "docker.usc.edu" ] && [ "$USC_ENV" != "cloud.usc.edu" ] && [ "$USC_ENV" != "aws" ]; then
-  echo "Environment: [local], dcorley-swarm.usc.edu, swarm-test.usc.edu, emailchoice.usc.edu, swarm.usc.edu, docker.usc.edu, cloud.usc.edu, aws: "
+if [ "$USC_ENV" != "dcorley-swarm.usc.edu" ] && [ "$USC_ENV" != "swarm-test.usc.edu" ] && [ "$USC_ENV" != "emailchoice.usc.edu" ] && [ "$USC_ENV" != "swarm.usc.edu" ] && [ "$USC_ENV" != "docker.usc.edu" ] && [ "$USC_ENV" != "cloud.usc.edu" ]  && [ "$USC_ENV" != "poc.usc.edu" ] && [ "$USC_ENV" != "aws" ]; then
+  echo "Environment: [local], dcorley-swarm.usc.edu, swarm-test.usc.edu, emailchoice.usc.edu, swarm.usc.edu, docker.usc.edu, cloud.usc.edu, poc.usc.edu, aws: "
   read USC_ENV
-  if [ "$USC_ENV" != "dcorley-swarm.usc.edu" ] && [ "$USC_ENV" != "swarm-test.usc.edu" ] && [ "$USC_ENV" != "emailchoice.usc.edu" ] && [ "$USC_ENV" != "swarm.usc.edu" ] && [ "$USC_ENV" != "docker.usc.edu" ] && [ "$USC_ENV" != "cloud.usc.edu" ] && [ "$USC_ENV" != "aws" ]; then
+  if [ "$USC_ENV" != "dcorley-swarm.usc.edu" ] && [ "$USC_ENV" != "swarm-test.usc.edu" ] && [ "$USC_ENV" != "emailchoice.usc.edu" ] && [ "$USC_ENV" != "swarm.usc.edu" ] && [ "$USC_ENV" != "docker.usc.edu" ] && [ "$USC_ENV" != "cloud.usc.edu" ] && [ "$USC_ENV" != "poc.usc.edu" ] && [ "$USC_ENV" != "aws" ]; then
     export USC_ENV=local
   fi
 fi
@@ -81,6 +81,12 @@ if [ "$1" = "emailchoice.usc.edu" ]; then
     export NODE01=emailchoice-prod-node1.usc.edu
     export NODE02=emailchoice-prod-node2.usc.edu
     export NODE03=emailchoice-prod-node3.usc.edu
+fi;
+if [ "$1" = "poc.usc.edu" ]; then
+    export NODE00=nsxpoc-swarm-mgr01.usc.edu
+    export NODE01=nsxpoc-swarm-mgr01.usc.edu
+    export NODE02=nsxpoc-swarm-mgr02.usc.edu
+    export NODE03=nsxpoc-swarm-mgr03.usc.edu
 fi;
 
 export DOCKER_HOST=tcp://${NODE00}:2376

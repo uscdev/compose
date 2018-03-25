@@ -1,0 +1,28 @@
+version: '3.1'
+services:
+  db:
+    image: mysql
+    ports:
+      - 3310:3306
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/tt_secrets.txt
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
+    volumes:
+      - wd-db-data6:/var/lib/mysql
+    secrets:
+      - tt_secrets.txt
+secrets:
+  tt_secrets.txt:
+    external: true
+volumes:
+  wd-db-data6:
+    external:
+      name: wd-db-data6

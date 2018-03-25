@@ -1,0 +1,81 @@
+docker service create \
+2 --name node-exporter \
+3 --mode global \
+4 --network proxy \
+5 --mount "type=bind,source=/proc,target=/host/proc" \
+6 --mount "type=bind,source=/sys,target=/host/sys" \
+7 --mount "type=bind,source=/,target=/rootfs" \
+8 prom/node-exporter:0.12.0 \
+9 -collector.procfs /host/proc \
+10 -collector.sysfs /host/sys \
+11 -collector.filesystem.ignored-mount-points \
+12 "^/(sys|proc|dev|host|etc)($|/)"
+
+
+docker service create --name cadvisor \
+2 -p 8080:8080 \
+3 --mode global \
+4 --network proxy \
+5 --mount "type=bind,source=/,target=/rootfs" \
+6 --mount "type=bind,source=/var/run,target=/var/run" \
+7 --mount "type=bind,source=/sys,target=/sys" \
+8 --mount "type=bind,source=/var/lib/docker,target=/var/lib/docker" \
+9 google/cadvisor:v0.24.1
+
+
+
+docker service create \
+2 --name prometheus \
+3 --network proxy \
+4 -p 9090:9090 \
+5 --mount "type=bind,source=$PWD/conf/prometheus.yml,target=/etc/prometheus/pr\
+6 ometheus.yml" \
+7 --mount "type=bind,source=$PWD/docker/prometheus,target=/prometheus" \
+8 prom/prometheus:v1.2.1
+
+
+docker service create \
+2 --name grafana \
+3 --network proxy \
+4 -p 3000:3000 \
+5 grafana/grafana:3.1.1
+
+docker service create \
+4 --name node-exporter \
+5 --mode global \
+6 --network proxy \
+7 --mount "type=bind,source=/proc,target=/host/proc" \
+8 --mount "type=bind,source=/sys,target=/host/sys" \
+9 --mount "type=bind,source=/,target=/rootfs" \
+10 --mount "type=bind,source=/etc/hostname,target=/etc/host_hostname" \
+11 -e HOST_HOSTNAME=/etc/host_hostname \
+12 basi/node-exporter:v0.1.1 \
+13 -collector.procfs /host/proc \
+14 -collector.sysfs /host/sys \
+15 -collector.filesystem.ignored-mount-points "^/(sys|proc|dev|host|etc)($|/)" \
+16 -collector.textfile.directory /etc/node-exporter/ \
+17 -collectors.enabled="conntrack,diskstats,entropy,filefd,filesystem,loadavg,m\
+18 dadm,meminfo,netdev,netstat,stat,textfile,time,vmstat,ipvs"
+
+cat conf/prometheus.yml
+The output is as follows.
+1 global:
+2 scrape_interval: 5s
+3
+4 scrape_configs:
+5 - job_name: 'node'
+6 dns_sd_configs:
+7 - names: ['tasks.node-exporter']
+8 type: A
+9 port: 9100
+10 - job_name: 'cadvisor'
+11 dns_sd_configs:
+165https://prometheus.io/docs/operating/configuration/
+166https://github.com/vfarcic/cloud-provisioning/blob/master/conf/prometheus.yml
+Collecting Metrics and Monitoring The Cluster 189
+12 - names: ['tasks.cadvisor']
+13 type: A
+14 port: 8080
+15 - job_name: 'prometheus'
+16 static_configs:
+17 - targets: ['prometheus:9090']

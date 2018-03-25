@@ -1,0 +1,31 @@
+version: '3.5'
+
+services:
+  ubuntu:
+    image: ubuntu
+    networks:
+      - proxy
+    volumes:
+      - jenkins-backup:/var/lib/jenkins-backup
+    command: sleep 36000
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+#      labels:
+#        - com.df.notify=true
+#        - com.df.distribute=true
+#        - com.df.serviceDomain=nginx.poc.usc.edu
+#        - com.df.port=80
+#        - com.df.httpsOnly=true
+      placement:
+        constraints:
+          - node.hostname==${NODE00}
+volumes:
+  jenkins-backup:
+networks:
+  proxy:
+    external: true
