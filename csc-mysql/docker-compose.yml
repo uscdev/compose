@@ -5,7 +5,7 @@ services:
     ports:
       - 3308:3306
     volumes:
-      - ${USC_LOCAL_DIR}/wd-mysql:/var/lib/mysql
+      - /mnt/docker/disk2/wd-mysql:/var/lib/mysql
     deploy:
       replicas: 1
       update_config:
