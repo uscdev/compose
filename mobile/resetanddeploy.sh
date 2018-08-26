@@ -28,6 +28,7 @@ fi;
 
 echo Remove old environment
 
+docker version
 docker swarm init
 docker stack rm mobile
 docker stack rm mobile-setup
