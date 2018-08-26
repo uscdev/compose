@@ -42,7 +42,9 @@ docker volume rm mobile-data
 
 echo Create new environment
 docker version
+ls -l
 cat docker-compose.yml
+echo go
 docker stack deploy --compose-file docker-compose.yml mobile
 echo ...Please wait while the environment is created
 sleep 120
