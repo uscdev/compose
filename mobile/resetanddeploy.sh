@@ -21,6 +21,8 @@ if [ "$1" = "aws" ] || [ "$1" = "" ] ; then
         export NODE01=${HOSTNAME}
     fi;
     if [ ! -e "docker-compose.yml" ]; then
+        rm docker-compose.yml
+        rm docker-compose-setup.yml
         curl -O https://raw.githubusercontent.com/uscdev/compose/master/mobile/docker-compose.yml
         curl -O https://raw.githubusercontent.com/uscdev/compose/master/mobile/docker-compose-setup.yml
     fi

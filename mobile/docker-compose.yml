@@ -1,4 +1,63 @@
 version: '3.7'
 services:
-  hello-world:
-    image: tutum/hello-world
+  mobile-wordpress:
+    image: wordpress
+    ports:
+      - ${USC_MOBILE_PORT}:80
+    depends_on:
+      - mobile-db
+    networks:
+      - proxy
+      - mobile-db
+    volumes:
+      - mobile-data:/var/www/html
+    deploy:
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.serviceDomain=mobile.docker.usc.edu
+        - com.df.port=80
+        - com.df.xForwardedProto=true
+        - com.df.httpsOnly=true
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname==${NODE00}
+    environment:
+      - WORDPRESS_DB_PASSWORD=${USC_MOBILE_DB_PASSWORD}
+      - WORDPRESS_DB_HOST=mobile-db
+      - ServerName=${USC_MOBILE_SERVER_NAME}
+  mobile-db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${USC_MOBILE_DB_PASSWORD}
+    networks:
+      - mobile-db
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname==${NODE00}
+    volumes:
+      - mobile-db:/var/lib/mysql
+networks:
+  mobile-db:
+#    driver: overlay
+    external: true
+  proxy:
+    external: true
+volumes:
+  mobile-db:
+    external: true
+  mobile-data:
+    external: true
