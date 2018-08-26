@@ -31,7 +31,7 @@ echo Remove old environment
 docker swarm init
 docker stack rm mobile
 docker stack rm mobile-setup
-sleep 5
+sleep 15
 docker network create --driver overlay mobile-db
 docker network create --driver overlay web-bus
 # sudo rm -fr ${USC_SHARED_DIR_NFS}/mobile/data/*
