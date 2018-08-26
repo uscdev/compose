@@ -30,7 +30,6 @@ fi;
 
 echo Remove old environment
 
-docker version
 docker swarm init
 docker stack rm mobile
 docker stack rm mobile-setup
@@ -43,10 +42,7 @@ docker volume rm mobile-db
 docker volume rm mobile-data
 
 echo Create new environment
-docker version
-ls -l
-cat docker-compose.yml
-echo go
+
 docker stack deploy --compose-file docker-compose.yml mobile
 echo ...Please wait while the environment is created
 sleep 120
