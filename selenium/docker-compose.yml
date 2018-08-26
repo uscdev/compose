@@ -1,0 +1,62 @@
+version: "3.7"
+services:
+  selenium-hub:
+    image: selenium/hub
+    networks:
+      robottestsnw: {}
+    ports:
+    - "4444:4444"
+  chrome:
+    image: selenium/node-chrome-debug
+    depends_on:
+    - selenium-hub
+    networks:
+      robottestsnw: {}
+    environment:
+    - HUB_HOST=selenium-hub
+    - HUB_PORT=4444
+    depends_on:
+    - selenium_hub
+#    volumes:
+#    - /dev/shm:/dev/shm
+
+    ports:
+    - "5555:5555"
+    - "5900:5900"
+  firefox:
+    image: selenium/node-firefox-debug
+    depends_on:
+    - selenium-hub
+    networks:
+      robottestsnw: {}
+    environment:
+    - HUB_HOST=selenium-hub
+    - HUB_PORT=4444
+#    volumes:
+#    - /dev/shm:/dev/shm
+    depends_on:
+    - selenium_hub
+    ports:
+    - "5554:5555"
+    - "5901:5900"
+
+
+#  app:
+#    networks:
+#      robottestsnw: {}
+#    ports:
+#      - 80
+
+#  robottests:
+#    command: /bin/sleep infinity
+#    networks:
+#      robottestsnw: {}
+#    depends_on:
+#      - selenium_hub
+#      - app
+#    volumes:
+#      - ./reports:/frontend-integration-tests/reports
+
+networks:
+  robottestsnw:
+    driver: overlay
