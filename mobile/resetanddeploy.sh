@@ -42,7 +42,7 @@ docker volume rm mobile-data
 
 echo Create new environment
 
-docker stack deploy --compose-file docker-compose.yml mobile
+docker stack deploy --compose-file docker-compose2.yml mobile
 echo ...Please wait while the environment is created
 sleep 120
 echo Importing content
