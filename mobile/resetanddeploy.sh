@@ -21,6 +21,8 @@ if [ "$1" = "aws" ] || [ "$1" = "" ] ; then
         export NODE01=${HOSTNAME}
     fi;
     if [ ! -e "docker-compose.yml" ]; then
+        rm docker-compose.yml
+        rm docker-compose-setup.yml
         curl -O https://raw.githubusercontent.com/uscdev/compose/master/mobile/docker-compose.yml
         curl -O https://raw.githubusercontent.com/uscdev/compose/master/mobile/docker-compose-setup.yml
     fi
@@ -31,7 +33,7 @@ echo Remove old environment
 docker swarm init
 docker stack rm mobile
 docker stack rm mobile-setup
-sleep 5
+sleep 15
 docker network create --driver overlay mobile-db
 docker network create --driver overlay web-bus
 # sudo rm -fr ${USC_SHARED_DIR_NFS}/mobile/data/*
