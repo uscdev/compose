@@ -1,14 +1,14 @@
 version: '3.5'
 services:
   nginx-dtr:
-    image: uscdev/nginx-dtr
+    image: uscdev/nginx-dtr:swarm-1.0.0
 #    ports:
 #      - 8443:8443
     networks:
       - proxy
     secrets:
-      - docker.usc.edu.key
-      - docker.usc.edu.cer
+      - swarm.usc.edu.key
+      - swarm.usc.edu.cer
     deploy:
       replicas: 1
       update_config:
@@ -21,13 +21,13 @@ services:
         - com.df.distribute=true
         - com.df.httpsOnly=true
         - com.df.port=8442
-        - com.df.serviceDomain=dtr.docker.usc.edu
+        - com.df.serviceDomain=dtr.swarm.usc.edu
         - com.df.sslVerifyNone=true
 networks:
   proxy:
     external: true
 secrets:
-  docker.usc.edu.key:
+  swarm.usc.edu.key:
     external: true
-  docker.usc.edu.cer:
+  swarm.usc.edu.cer:
     external: true

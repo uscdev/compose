@@ -17,7 +17,7 @@ services:
     deploy:
       replicas: 1
     secrets:
-      - cert-docker.usc.edu.pem
+      - cert-swarm.usc.edu.pem
       - cert-emailchoice.usc.edu.pem
       - cert-workday-account-translator.usc.edu.pem
       - cert-itapps.usc.edu.pem
@@ -39,7 +39,7 @@ networks:
   proxy:
     external: true
 secrets:
-  cert-docker.usc.edu.pem:
+  cert-swarm.usc.edu.pem:
     external: true
   cert-emailchoice.usc.edu.pem:
     external: true

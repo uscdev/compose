@@ -1,16 +1,16 @@
-version: '3.1'
+version: '3.2'
 services:
   wordpress:
-    image: wordpress
-    ports:
-      - 8101:80
+    image: wordpress:4.8.1
+#    ports:
+#      - 8101:80
     depends_on:
       - db
     networks:
       - wordpress-db
       - proxy
     volumes:
-      - ${USC_SHARED_DIR_NFS}/wordpress/data:/var/www/html
+      - wordpress-data:/var/www/html
     deploy:
       labels:
         - com.df.notify=true
@@ -18,28 +18,56 @@ services:
         - com.df.port=80
         - com.df.xForwardedProto=true
         - com.df.httpsOnly=true
-        - com.df.serviceDomain=wordpress.docker.usc.edu
-      replicas: 1
+        - com.df.serviceDomain=wordpress.swarm.usc.edu
+      replicas: 2
       update_config:
         parallelism: 1
         delay: 10s
       restart_policy:
         condition: on-failure
     environment:
-      - WORDPRESS_DB_PASSWORD=${USC_WORDPRESS_DB_PASSWORD}
+      - WORDPRESS_DB_PASSWORD=passw0rd
       - WORDPRESS_DB_HOST=db
       - ServerName=wordpress.docker.usc.edu
   db:
     image: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ${USC_WORDPRESS_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: passw0rd
     networks:
       - wordpress-db
     volumes:
-      - ${USC_SHARED_DIR_NFS}/wordpress/db:/var/lib/mysql
+      - wordpress-db:/var/lib/mysql
 networks:
   wordpress-db:
     driver: overlay
   proxy:
     external:
       name: proxy
+volumes:
+  wordpress-db:
+    driver: cloudstor:aws
+  wordpress-data:
+    external: true
+#    external:
+#      name: db-data
+#      source: {{.Service.Name}}-{{.Task.Slot}}-vol
+#    target: /mydata
+#    driver_opts:
+#      size: 25
+#      backing: relocatable
+#      ebstype: gp2
+# volume-opt=size=10
+#
+# --mount type=volume,volume-driver=cloudstor:aws,source=sharedvol1,destination=/shareddata
+#
+# docker service create \
+#  --replicas 5 \
+#  --name ping3 \
+#  --mount type=volume,volume-driver=cloudstor:aws,source={{.Service.Name}}-{{.Task.Slot}}-vol,destination=/mydata,volume-opt=backing=relocatable,volume-opt=size=25,volume-opt=ebstype=gp2 \
+#  alpine ping docker.com
+#
+# volumes:
+#  - type: volume
+#    source: source={{.Service.Name}}-{{.Task.Slot}}-vol
+#    target: /var/lib/mysql
+#    volume:
