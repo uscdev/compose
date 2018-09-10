@@ -43,13 +43,13 @@ services:
       restart_policy:
         condition: on-failure
   db:
-    image: mysql
+    image: postgres
     environment:
-      MYSQL_ROOT_PASSWORD: passw0rd
+      POSTGRES_PASSWORD: passw0rd
     networks:
       - guacamole
     volumes:
-      - wordpress-data:/var/www/html
+      - pgdata:/var/lib/postgresql/data
     deploy:
       replicas: 1
       update_config:
@@ -57,25 +57,11 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
-    image: mysql
-    ports:
-      - 3306:3306
-    volumes:
-      - guacamole-db:/var/lib/mysql
-    deploy:
-      replicas: 1
-      update_config:
-        parallelism: 1
-        delay: 10s
-      restart_policy:
-        condition: on-failure
-    environment:
-      MYSQL_ROOT_PASSWORD: passw0rd
 networks:
   guacamole:
     driver: overlay
   proxy:
     external: true
 volumes:
-  guacamole-db:
+  pgdata:
     external: true
