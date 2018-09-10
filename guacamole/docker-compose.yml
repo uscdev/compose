@@ -1,0 +1,81 @@
+version: '3.7'
+services:
+  guacamole:
+    image: guacamole/guacamole:latest
+    ports:
+      - 8080:8080
+    depends_on:
+      - guacd
+      - mysql
+    networks:
+      - guacamole
+      - proxy
+    deploy:
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.port=80
+        - com.df.xForwardedProto=true
+        - com.df.httpsOnly=true
+        - com.df.serviceDomain=guacamole.swarm.usc.edu
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    environment:
+      - GUACD_HOSTNAME=guacd
+      - MYSQL_HOSTNAME=db
+      - MYSQL_DATABASE=guacamole_db
+      - MYSQL_USER=guacamole_user
+      - MYSQL_PASSWORD=passw0rd
+
+  guacd:
+    image: guacamole/guacd:latest
+    networks:
+      - guacamole
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+  db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: passw0rd
+    networks:
+      - guacamole
+    volumes:
+      - wordpress-data:/var/www/html
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    image: mysql
+    ports:
+      - 3306:3306
+    volumes:
+      - guacamole-db:/var/lib/mysql
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    environment:
+      MYSQL_ROOT_PASSWORD: passw0rd
+networks:
+  guacamole:
+    driver: overlay
+  proxy:
+    external: true
+volumes:
+  guacamole-db:
+    external: true
