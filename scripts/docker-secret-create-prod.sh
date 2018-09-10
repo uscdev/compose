@@ -4,14 +4,33 @@ export SECRET_PATH=/run/secrets
 export PEM_PATH=$SECRET_PATH/certificates/usc
 
 export SITE=cloud
-docker secret create cert-$SITE.usc.edu.pem $PEM_PATH/$SITE.usc.edu/haproxy/cert-$SITE.usc.edu.pem
+export DOMAIN_NAME=$SITE.usc.edu
+docker secret create cert-$DOMAIN_NAME.pem $PEM_PATH/$DOMAIN_NAME/haproxy/cert-$DOMAIN_NAME.pem
+
 export SITE=emailchoice
-docker secret create cert-$SITE.usc.edu.pem $PEM_PATH/$SITE.usc.edu/haproxy/cert-$SITE.usc.edu.pem
+export DOMAIN_NAME=$SITE.usc.edu
+docker secret create cert-$DOMAIN_NAME.pem $PEM_PATH/$DOMAIN_NAME/haproxy/cert-$DOMAIN_NAME.pem
+docker secret create $DOMAIN_NAME-cert.pem $PEM_PATH/$DOMAIN_NAME/haproxy/cert-$DOMAIN_NAME.pem
+docker secret create $DOMAIN_NAME.key $PEM_PATH/$DOMAIN_NAME/$DOMAIN_NAME.key
+docker secret create $DOMAIN_NAME-sp-key.pem $PEM_PATH/shibboleth/$DOMAIN_NAME/sp-key.pem
+docker secret create $DOMAIN_NAME-sp-cert.pem $PEM_PATH/shibboleth/$DOMAIN_NAME/sp-cert.pem
+docker secret create $DOMAIN_NAME-tt_secrets.txt $SECRET_PATH/passwords/usc/workday/tt_secrets.txt
+
 export SITE=workday-account-translator
-docker secret create cert-$SITE.usc.edu.pem $PEM_PATH/$SITE.usc.edu/haproxy/cert-$SITE.usc.edu.pem
+export DOMAIN_NAME=$SITE.usc.edu
+docker secret create cert-$DOMAIN_NAME.pem $PEM_PATH/$DOMAIN_NAME/haproxy/cert-$DOMAIN_NAME.pem
+docker secret create $DOMAIN_NAME-cert.pem $PEM_PATH/$DOMAIN_NAME/haproxy/cert-$DOMAIN_NAME.pem
+docker secret create $DOMAIN_NAME.key $PEM_PATH/$DOMAIN_NAME/$DOMAIN_NAME.key
+docker secret create $DOMAIN_NAME-sp-key.pem $PEM_PATH/shibboleth/$DOMAIN_NAME/sp-key.pem
+docker secret create $DOMAIN_NAME-sp-cert.pem $PEM_PATH/shibboleth/$DOMAIN_NAME/sp-cert.pem
+docker secret create $DOMAIN_NAME-my-groups-api-dropbox.txt $SECRET_PATH//passwords/usc/iam/dropbox/my-groups-api.txt
+
 export SITE=itapps
-docker secret create cert-$SITE.usc.edu.pem $PEM_PATH/$SITE.usc.edu/haproxy/cert-$SITE.usc.edu.pem
+export DOMAIN_NAME=$SITE.usc.edu
+docker secret create cert-$DOMAIN_NAME.pem $PEM_PATH/$DOMAIN_NAME/haproxy/cert-$DOMAIN_NAME.pem
+
 export SITE=device-registration
-docker secret create cert-$SITE.usc.edu.pem $PEM_PATH/$SITE.usc.edu/haproxy/cert-$SITE.usc.edu.pem
+export DOMAIN_NAME=$SITE.usc.edu
+docker secret create cert-$DOMAIN_NAME.pem $PEM_PATH/$DOMAIN_NAME/haproxy/cert-$DOMAIN_NAME.pem
 
 docker network create --driver overlay proxy
