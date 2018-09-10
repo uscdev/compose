@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.7'
 services:
   mobile-setup:
     image: uscdev/mobile-setup
@@ -27,15 +27,11 @@ services:
 networks:
   mobile-db:
 #    driver: overlay
-    external:
-      name: mobile-db
+    external: true
   web-bus:
-    external:
-      name: web-bus
+    external: true
 volumes:
   mobile-db:
-    external:
-      name: mobile-db
+    external: true
   mobile-data:
-    external:
-      name: mobile-data
+    external: true

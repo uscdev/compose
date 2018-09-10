@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.7'
 services:
   mobile-wordpress:
     image: wordpress
@@ -53,15 +53,11 @@ services:
 networks:
   mobile-db:
 #    driver: overlay
-    external:
-      name: mobile-db
+    external: true
   proxy:
-    external:
-      name: proxy
+    external: true
 volumes:
   mobile-db:
-    external:
-      name: mobile-db
+    external: true
   mobile-data:
-    external:
-      name: mobile-data
+    external: true

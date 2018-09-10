@@ -1,11 +1,11 @@
-version: '3.1'
+version: '3.5'
 services:
   csc-mysql:
-    image: mysql
+    image: mysql:latest
     ports:
       - 3308:3306
     volumes:
-      - ${USC_LOCAL_DIR}/wd-mysql:/var/lib/mysql
+      - /mnt/docker/disk2/wd-mysql:/var/lib/mysql
     deploy:
       replicas: 1
       update_config:

@@ -1,11 +1,11 @@
-version: '3.1'
+version: '3.7'
 services:
   le-mysql:
     image: mysql
     ports:
       - 3309:3306
     volumes:
-      - ${USC_LOCAL_DIR}/le-mysql:/var/lib/mysql
+      - "/mnt/docker/disk2/le-mysql:/var/lib/mysql"
     deploy:
       replicas: 1
       update_config:
