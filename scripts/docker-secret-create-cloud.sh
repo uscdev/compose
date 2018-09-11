@@ -5,7 +5,7 @@ export PEM_PATH=$SECRET_PATH/certificates/usc
 
 export SITE=cloud
 export DOMAIN_NAME=$SITE.usc.edu
-docker secret create cert-$DOMAIN_NAME.pem $PEM_PATH/$DOMAIN_NAME/haproxy/cert-$DOMAIN_NAME.pem
+docker secret create $DOMAIN_NAME-cert.pem $PEM_PATH/$DOMAIN_NAME/haproxy/cert-$DOMAIN_NAME.pem
 
 export SITE=emailchoice
 export DOMAIN_NAME=$SITE.usc.edu
