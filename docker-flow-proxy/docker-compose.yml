@@ -17,11 +17,11 @@ services:
     deploy:
       replicas: 1
     secrets:
-      - swarm.usc.edu-cert.pem
-      - emailchoice.usc.edu-cert.pem
-      - workday-account-translator.usc.edu-cert.pem
-      - itapps.usc.edu-cert.pem
-      - device-registration.usc.edu-cert.pem
+      - cert-swarm.usc.edu.pem
+      - cert-emailchoice.usc.edu.pem
+      - cert-workday-account-translator.usc.edu.pem
+      - cert-itapps.usc.edu.pem
+      - cert-device-registration.usc.edu.pem
   swarm-listener:
     image: vfarcic/docker-flow-swarm-listener
     networks:
@@ -39,13 +39,13 @@ networks:
   proxy:
     external: true
 secrets:
-  swarm.usc.edu-cert.pem:
+  cert-swarm.usc.edu.pem:
     external: true
-  emailchoice.usc.edu-cert.pem:
+  cert-emailchoice.usc.edu.pem:
     external: true
-  workday-account-translator.usc.edu-cert.pem:
+  cert-workday-account-translator.usc.edu.pem:
     external: true
-  itapps.usc.edu-cert.pem:
+  cert-itapps.usc.edu.pem:
     external: true
-  device-registration.usc.edu-cert.pem:
+  cert-device-registration.usc.edu.pem:
     external: true
