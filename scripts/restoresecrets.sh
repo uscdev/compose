@@ -9,4 +9,3 @@ fi
 cd /run
 sudo echo
 sudo openssl des3 -d -in $SECRETS_FILE_PATH/$USC_FILTER.tar.gz.enc | sudo tar -C /run -xz
-
