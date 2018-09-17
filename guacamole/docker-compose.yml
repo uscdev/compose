@@ -1,0 +1,67 @@
+version: '3.7'
+services:
+  guacamole:
+    image: guacamole/guacamole:latest
+    ports:
+      - 8080:8080
+    depends_on:
+      - guacd
+      - mysql
+    networks:
+      - guacamole
+      - proxy
+    deploy:
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.port=80
+        - com.df.xForwardedProto=true
+        - com.df.httpsOnly=true
+        - com.df.serviceDomain=guacamole.swarm.usc.edu
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    environment:
+      - GUACD_HOSTNAME=guacd
+      - POSTGRES_HOSTNAME=db
+      - POSTGRES_DATABASE=guacamole_db
+      - POSTGRES_USER=guacamole_user
+      - POSTGRES_PASSWORD=passw0rd
+
+  guacd:
+    image: guacamole/guacd:latest
+    networks:
+      - guacamole
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: passw0rd
+    networks:
+      - guacamole
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+networks:
+  guacamole:
+    driver: overlay
+  proxy:
+    external: true
+volumes:
+  pgdata:
+    external: true
