@@ -52,7 +52,14 @@ docker volume create -d "cloudstor:aws" \
 #  --opt ebstype=io1 \
 #  --opt iops=1000 \
 
-docker volume create -d "cloudstor:aws" --opt backing=shared jenkins-data
+# docker volume create -d "cloudstor:aws" --opt backing=shared jenkins-data
+docker volume create -d "cloudstor:aws" \
+  --opt size=30 \
+  --opt backing=relocatable \
+  jenkins-data
 
-docker volume create -d "cloudstor:aws" --opt backing=shared nexus-data
-
+# docker volume create -d "cloudstor:aws" --opt backing=shared nexus-data
+docker volume create -d "cloudstor:aws" \
+  --opt size=30 \
+  --opt backing=relocatable \
+  nexus-data
