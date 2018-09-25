@@ -32,7 +32,7 @@ services:
       - ServerName=wordpress.docker.usc.edu
 
   db:
-    image: mysql
+    image: mysql:5
     environment:
       MYSQL_ROOT_PASSWORD: passw0rd
     networks:
