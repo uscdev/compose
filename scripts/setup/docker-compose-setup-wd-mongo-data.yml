@@ -1,0 +1,21 @@
+version: '3.7'
+
+services:
+  ubuntu:
+    image: ubuntu:xenial
+    volumes:
+    - wd-mongo-data:/data/db
+    command: sleep 3600
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: none
+      placement:
+        constraints:
+        - node.hostname==ip-172-31-11-235.us-west-2.compute.internal
+volumes:
+  wd-mongo-data:
+    external: true

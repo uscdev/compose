@@ -1,5 +1,6 @@
-version: '3.4'
+version: '3.7'
 services:
+
   wordpress:
     image: wordpress:4.8.1
 #    ports:
@@ -29,28 +30,38 @@ services:
       - WORDPRESS_DB_PASSWORD=passw0rd
       - WORDPRESS_DB_HOST=db
       - ServerName=wordpress.docker.usc.edu
+
   db:
-    image: mysql
+    image: mysql:5
     environment:
       MYSQL_ROOT_PASSWORD: passw0rd
     networks:
       - wordpress-db
     volumes:
       - wordpress-db:/var/lib/mysql
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
 networks:
   wordpress-db:
     driver: overlay
   proxy:
-    external:
-      name: proxy
+    external: true
+
 volumes:
   wordpress-db:
-    driver: cloudstor:aws
-    driver_opts:
-      ebstype: io1
-      size: 25
-      iops: 1000
-      backing: relocatable
+#    driver: cloudstor:aws
+#    driver_opts:
+#      ebstype: io1
+#      size: 25
+#      iops: 1000
+#      backing: relocatable
+    external: true
   wordpress-data:
     external: true
 #    external:
