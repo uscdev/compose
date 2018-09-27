@@ -7,8 +7,8 @@ services:
     networks:
       - proxy
     secrets:
-      - swarm.usc.edu.key
-      - swarm.usc.edu.cer
+      - docker.usc.edu.key
+      - docker.usc.edu.cer
     deploy:
       replicas: 1
       update_config:
@@ -27,7 +27,7 @@ networks:
   proxy:
     external: true
 secrets:
-  swarm.usc.edu.key:
+  docker.usc.edu.key:
     external: true
-  swarm.usc.edu.cer:
+  docker.usc.edu.cer:
     external: true
