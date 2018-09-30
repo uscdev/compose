@@ -4,7 +4,7 @@ const {Builder, By, Key, until} = require('selenium-webdriver');
 (async function example() {
   try {
     // seleniumhub is the name of the selenium container used in the docker-compose file 
-    let driver = await new Builder().forBrowser('firefox').usingServer('http://seleniumhub:4444/wd/hub').build();
+    let driver = await new Builder().forBrowser('firefox').usingServer('http://selenium:4444/wd/hub').build();
     
     // wordpress is the name of the wordpress container used in the docker-compose file
     await driver.get('http://wordpress:80');

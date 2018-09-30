@@ -3,20 +3,21 @@ services:
 
   guacamole:
     image: guacamole/guacamole
+    hostname: guacamole
     ports:
     - 8080:8080
     depends_on:
     - guacd
-    - mysql
+    - db
     networks:
     - proxy
-#    - guacd
-#    - mysql
+    - guacd
+    - db
     environment:
     - "GUACD_HOSTNAME=guacd"
     - "GUACD_PORT=4822"
     - "GUACAMOLE_HOME=/home"
-    - "MYSQL_HOSTNAME=mysql"
+    - "MYSQL_HOSTNAME=db"
     - "MYSQL_DATABASE=guacamole_db"
     - "MYSQL_USER=guacamole_user"
     - "MYSQL_PASSWORD=password"
@@ -37,10 +38,10 @@ services:
 
   guacd:
     image: guacamole/guacd
+    hostname: guacd
     networks:
-    - proxy
-#    - guacd
-#    - guacamole
+    - guacamole
+    - guacd
     ports:
     - "4822:4822"
     deploy:
@@ -51,18 +52,18 @@ services:
       restart_policy:
         condition: on-failure
 
-  mysql:
+  db:
     image: mysql:5.7
+    hostname: db
+    networks:
+    - db
+    volumes:
+    - db:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: example
       MYSQL_DATABASE: guacamole_db
       MYSQL_USER: guacamole_user
       MYSQL_PASSWORD: password
-    networks:
-    - proxy
-#    - mysql
-    volumes:
-    - guacamole-db:/var/lib/mysql
     deploy:
       replicas: 1
       update_config:
@@ -74,7 +75,7 @@ services:
 networks:
   guacd:
     driver: overlay
-  mysql:
+  db:
     driver: overlay
   proxy:
     external: true
@@ -82,5 +83,6 @@ networks:
     external: true
 
 volumes:
-  guacamole-db:
+  db:
     external: true
+    name: guacamole-db

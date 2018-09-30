@@ -1,15 +1,18 @@
 version: "3.7"
 services:
 
-  seleniumhub:
+  selenium:
     image: selenium/hub
+    hostname: selenium
+    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 4444" /opt/bin/entry_point.sh'
     networks:
-    - proxy
-#    - seleniumhub
+    - guacamole # No - use selenium-nodes
+#    - selenium-nodes
 #    - selenium
+    - test
+    - proxy
     ports:
     - "4444:4444"
-    hostname: seleniumhub
     deploy:
       replicas: 1
       update_config:
@@ -20,24 +23,23 @@ services:
 
   chrome:
     image: selenium/node-chrome-debug
+    hostname: chrome
+    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 5555" /opt/bin/entry_point.sh'
     depends_on:
-    - seleniumhub
+    - selenium
     ports:
     - "5556:5555"
     - "5901:5900"
+    shm_size: "2g"
     environment:
-    - HUB_HOST=seleniumhub
+    - HUB_HOST=selenium
     - HUB_PORT=4444
     - NODE_MAX_SESSION=1
-    hostname: chrome
-    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 5555" /opt/bin/entry_point.sh'
-#    - --shm-size=2g
 #    volumes:
 #    - /dev/shm:/dev/shm
     networks:
-#    - seleniumhub
-    - proxy
-#    - guacamole
+#    - selenium-nodes
+    - guacamole
     deploy:
       replicas: 1
       update_config:
@@ -48,21 +50,21 @@ services:
 
   firefox:
     image: selenium/node-firefox-debug
+    hostname: firefox
+    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 5555" /opt/bin/entry_point.sh'
+    shm_size: "2g"
     depends_on:
-    - seleniumhub
+    - selenium
     ports:
     - "5557:5555"
     - "5902:5900"
     environment:
-    - HUB_HOST=seleniumhub
+    - HUB_HOST=selenium
     - HUB_PORT=4444
     - NODE_MAX_SESSION=1
-    hostname: firefox
-    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 5555" /opt/bin/entry_point.sh'
     networks:
-#    - seleniumhub
-    - proxy
-#    - guacamole
+#    - selenium-nodes
+    - guacamole
     deploy:
       replicas: 1
       update_config:
@@ -72,11 +74,13 @@ services:
         condition: on-failure
 
 networks:
-  selenium:
+  selenium-nodes:
     driver: overlay
-  seleniumhub:
+  selenium:
     external: true
   guacamole:
     external: true
   proxy:
+    external: true
+  test:
     external: true

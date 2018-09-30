@@ -10,7 +10,8 @@ services:
     - db
     networks:
     - proxy
-    - wordpress-db
+    - test
+    - db
     volumes:
     - wordpress-data:/var/www/html
     deploy:
@@ -29,16 +30,16 @@ services:
         condition: on-failure
     environment:
     - WORDPRESS_DB_PASSWORD=passw0rd
-    - WORDPRESS_DB_HOST=wordpress-db
+    - WORDPRESS_DB_HOST=db
     - ServerName=wordpress.docker.usc.edu
 
-  wordpress-db:
+  db:
     image: mysql:5.7
-    hostname: wordpress-db
+    hostname: db
     environment:
       MYSQL_ROOT_PASSWORD: passw0rd
     networks:
-    - wordpress-db
+    - db
     volumes:
     - wordpress-db:/var/lib/mysql
     deploy:
@@ -50,9 +51,11 @@ services:
         condition: on-failure
 
 networks:
-  wordpress-db:
+  db:
     driver: overlay
   proxy:
+    external: true
+  test:
     external: true
 
 volumes:
