@@ -10,8 +10,8 @@ services:
     - mysql
     networks:
     - proxy
-    - guacd
-    - mysql
+#    - guacd
+#    - mysql
     environment:
     - "GUACD_HOSTNAME=guacd"
     - "GUACD_PORT=4822"
@@ -38,8 +38,9 @@ services:
   guacd:
     image: guacamole/guacd
     networks:
-    - guacd
-    - guacamole
+    - proxy
+#    - guacd
+#    - guacamole
     ports:
     - "4822:4822"
     deploy:
@@ -58,7 +59,8 @@ services:
       MYSQL_USER: guacamole_user
       MYSQL_PASSWORD: password
     networks:
-    - mysql
+    - proxy
+#    - mysql
     volumes:
     - guacamole-db:/var/lib/mysql
     deploy:

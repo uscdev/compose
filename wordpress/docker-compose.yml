@@ -3,23 +3,24 @@ services:
 
   wordpress:
     image: wordpress:4.8.1
+    hostname: wordpress
 #    ports:
 #      - 8101:80
     depends_on:
-      - db
+    - db
     networks:
-      - wordpress-db
-      - proxy
+    - proxy
+    - wordpress-db
     volumes:
-      - wordpress-data:/var/www/html
+    - wordpress-data:/var/www/html
     deploy:
       labels:
-        - com.df.notify=true
-        - com.df.distribute=true
-        - com.df.port=80
-        - com.df.xForwardedProto=true
-        - com.df.httpsOnly=true
-        - com.df.serviceDomain=wordpress.swarm.usc.edu
+      - com.df.notify=true
+      - com.df.distribute=true
+      - com.df.port=80
+      - com.df.xForwardedProto=true
+      - com.df.httpsOnly=true
+      - com.df.serviceDomain=wordpress.swarm.usc.edu
       replicas: 2
       update_config:
         parallelism: 1
@@ -27,18 +28,19 @@ services:
       restart_policy:
         condition: on-failure
     environment:
-      - WORDPRESS_DB_PASSWORD=passw0rd
-      - WORDPRESS_DB_HOST=db
-      - ServerName=wordpress.docker.usc.edu
+    - WORDPRESS_DB_PASSWORD=passw0rd
+    - WORDPRESS_DB_HOST=wordpress-db
+    - ServerName=wordpress.docker.usc.edu
 
-  db:
-    image: mysql:5
+  wordpress-db:
+    image: mysql:5.7
+    hostname: wordpress-db
     environment:
       MYSQL_ROOT_PASSWORD: passw0rd
     networks:
-      - wordpress-db
+    - wordpress-db
     volumes:
-      - wordpress-db:/var/lib/mysql
+    - wordpress-db:/var/lib/mysql
     deploy:
       replicas: 1
       update_config:

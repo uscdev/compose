@@ -4,10 +4,12 @@ services:
   seleniumhub:
     image: selenium/hub
     networks:
-    - seleniumhub
-    - selenium
+    - proxy
+#    - seleniumhub
+#    - selenium
     ports:
     - "4444:4444"
+    hostname: seleniumhub
     deploy:
       replicas: 1
       update_config:
@@ -26,10 +28,16 @@ services:
     environment:
     - HUB_HOST=seleniumhub
     - HUB_PORT=4444
+    - NODE_MAX_SESSION=1
+    hostname: chrome
+    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 5555" /opt/bin/entry_point.sh'
+#    - --shm-size=2g
+#    volumes:
+#    - /dev/shm:/dev/shm
     networks:
-    - seleniumhub
+#    - seleniumhub
     - proxy
-    - guacamole
+#    - guacamole
     deploy:
       replicas: 1
       update_config:
@@ -48,10 +56,13 @@ services:
     environment:
     - HUB_HOST=seleniumhub
     - HUB_PORT=4444
+    - NODE_MAX_SESSION=1
+    hostname: firefox
+    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 5555" /opt/bin/entry_point.sh'
     networks:
-    - seleniumhub
+#    - seleniumhub
     - proxy
-    - guacamole
+#    - guacamole
     deploy:
       replicas: 1
       update_config:
