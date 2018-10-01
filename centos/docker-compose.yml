@@ -1,0 +1,55 @@
+version: '3.7'
+services:
+
+  centos1:
+    image: centos
+    hostname: centos1
+    command: sleep 36000
+    networks:
+    - centos1
+    - centos2
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  centos2:
+    image: centos
+    hostname: centos2
+    command: sleep 36000
+    networks:
+    - centos1
+    - centos3
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  centos3:
+    image: centos
+    hostname: centos3
+    command: sleep 36000
+    networks:
+    - centos2
+    - centos3
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+networks:
+  centos1:
+    driver: overlay
+  centos2:
+    driver: overlay
+  centos3:
+    driver: overlay
