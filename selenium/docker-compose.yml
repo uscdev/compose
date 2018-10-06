@@ -4,7 +4,7 @@ services:
   selenium:
     image: selenium/hub
     hostname: selenium
-    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 4444" /opt/bin/entry_point.sh'
+    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
     networks:
     - guacamole # No - use selenium-nodes
 #    - selenium-nodes
@@ -24,7 +24,7 @@ services:
   chrome:
     image: selenium/node-chrome-debug
     hostname: chrome
-    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 5555" /opt/bin/entry_point.sh'
+    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
     depends_on:
     - selenium
     ports:
@@ -51,7 +51,7 @@ services:
   firefox:
     image: selenium/node-firefox-debug
     hostname: firefox
-    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 5555" /opt/bin/entry_point.sh'
+    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
     shm_size: "2g"
     depends_on:
     - selenium

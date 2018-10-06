@@ -1,13 +1,13 @@
-version: '3.5'
-
+version: '3.7'
 services:
-  ubuntu:
+
+  ubuntu1:
     image: ubuntu
-    networks:
-      - proxy
-    volumes:
-      - jenkins-backup:/var/lib/jenkins-backup
+    hostname: ubuntu1
     command: sleep 36000
+    networks:
+    - ubuntu1
+    - ubuntu2
     deploy:
       replicas: 1
       update_config:
@@ -15,17 +15,41 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
-#      labels:
-#        - com.df.notify=true
-#        - com.df.distribute=true
-#        - com.df.serviceDomain=nginx.poc.usc.edu
-#        - com.df.port=80
-#        - com.df.httpsOnly=true
-      placement:
-        constraints:
-          - node.hostname==${NODE00}
-volumes:
-  jenkins-backup:
+
+  ubuntu2:
+    image: ubuntu
+    hostname: ubuntu2
+    command: sleep 36000
+    networks:
+    - ubuntu1
+    - ubuntu3
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  ubuntu3:
+    image: ubuntu
+    hostname: ubuntu3
+    command: sleep 36000
+    networks:
+    - ubuntu2
+    - ubuntu3
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
 networks:
-  proxy:
-    external: true
+  ubuntu1:
+    driver: overlay
+  ubuntu2:
+    driver: overlay
+  ubuntu3:
+    driver: overlay
