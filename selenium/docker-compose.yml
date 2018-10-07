@@ -30,13 +30,13 @@ services:
     ports:
     - "5556:5555"
     - "5901:5900"
-    shm_size: "2g"
     environment:
     - HUB_HOST=selenium
     - HUB_PORT=4444
     - NODE_MAX_SESSION=1
-#    volumes:
-#    - /dev/shm:/dev/shm
+#    shm_size: "2g"
+    volumes:
+    - /dev/shm:/dev/shm
     networks:
 #    - selenium-nodes
     - guacamole
@@ -52,7 +52,6 @@ services:
     image: selenium/node-firefox-debug
     hostname: firefox
     entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
-    shm_size: "2g"
     depends_on:
     - selenium
     ports:
@@ -62,6 +61,9 @@ services:
     - HUB_HOST=selenium
     - HUB_PORT=4444
     - NODE_MAX_SESSION=1
+    #    shm_size: "2g"
+    volumes:
+    - /dev/shm:/dev/shm
     networks:
 #    - selenium-nodes
     - guacamole
