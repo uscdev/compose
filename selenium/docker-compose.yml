@@ -6,15 +6,16 @@ services:
     hostname: selenium
     entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
     networks:
-    - guacamole # No - use selenium-nodes
-#    - selenium-nodes
-#    - selenium
-    - test
+    - selenium-nodes
+    - selenium
     - proxy
     ports:
     - "4444:4444"
     deploy:
       replicas: 1
+      labels:
+        selenium.grid.type: "hub"
+        selenium.grid.hub: "true"
       update_config:
         parallelism: 1
         delay: 10s
@@ -24,56 +25,84 @@ services:
   chrome:
     image: selenium/node-chrome-debug
     hostname: chrome
-    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
+#    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
+    entrypoint: >
+      bash -c '
+        export IP_ADDRESS=$$(ip addr show eth0 | grep "inet\b" | awk '"'"'{print $$2}'"'"' | awk -F/ '"'"'{print $$1}'"'"' | head -1) &&
+        SE_OPTS="-host $$IP_ADDRESS"  /usr/bin/supervisord --configuration /etc/supervisord.conf'
+    volumes:
+    - /dev/urandom:/dev/random
+    - /dev/shm:/dev/shm
+    environment:
+    - HUB_HOST=selenium
+    - HUB_PORT=4444
+    - NODE_MAX_SESSION=1
+    - HUB_PORT_4444_TCP_ADDR=hub
+    - HUB_PORT_4444_TCP_PORT=4444
     depends_on:
     - selenium
     ports:
     - "5556:5555"
     - "5901:5900"
-    environment:
-    - HUB_HOST=selenium
-    - HUB_PORT=4444
-    - NODE_MAX_SESSION=1
 #    shm_size: "2g"
-    volumes:
-    - /dev/shm:/dev/shm
     networks:
-#    - selenium-nodes
+    - selenium-nodes
     - guacamole
+    - test
     deploy:
+      mode: replicated
       replicas: 1
+      labels:
+        selenium.grid.type: "node"
+        selenium.grid.node: "true"
+        selenium.grid.node.type: "chrome"
       update_config:
         parallelism: 1
         delay: 10s
       restart_policy:
         condition: on-failure
+#      placement:
+#        constraints: [node.role == worker]
 
   firefox:
     image: selenium/node-firefox-debug
     hostname: firefox
-    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
-    depends_on:
-    - selenium
-    ports:
-    - "5557:5555"
-    - "5902:5900"
+#    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
+    entrypoint: >
+      bash -c '
+        export IP_ADDRESS=$$HOSTNAME &&
+        SE_OPTS="-host $$IP_ADDRESS"  /usr/bin/supervisord --configuration /etc/supervisord.conf'
+    volumes:
+    - /dev/shm:/dev/shm
+    - /dev/urandom:/dev/random
     environment:
     - HUB_HOST=selenium
     - HUB_PORT=4444
+    - HUB_PORT_4444_TCP_ADDR=hub
+    - HUB_PORT_4444_TCP_PORT=4444
     - NODE_MAX_SESSION=1
-    #    shm_size: "2g"
-    volumes:
-    - /dev/shm:/dev/shm
-    networks:
-#    - selenium-nodes
-    - guacamole
+    depends_on:
+    - selenium
     deploy:
+      mode: replicated
       replicas: 1
+      labels:
+        selenium.grid.type: "node"
+        selenium.grid.node: "true"
+        selenium.grid.node.type: "firefox"
       update_config:
         parallelism: 1
         delay: 10s
       restart_policy:
         condition: on-failure
+    ports:
+    - "5557:5555"
+    - "5902:5900"
+#    shm_size: "2g"
+    networks:
+    - selenium-nodes
+    - guacamole
+    - test
 
 networks:
   selenium-nodes:
