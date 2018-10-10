@@ -10,8 +10,8 @@ services:
     - db
     networks:
     - proxy
-    - test
     - db
+    - test
     volumes:
     - wordpress-data:/var/www/html
     deploy:
@@ -51,12 +51,12 @@ services:
         condition: on-failure
 
 networks:
-  db:
-    driver: overlay
   proxy:
     external: true
   test:
     external: true
+  db:
+    driver: overlay
 
 volumes:
   wordpress-db:

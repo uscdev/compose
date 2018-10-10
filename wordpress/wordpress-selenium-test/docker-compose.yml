@@ -5,8 +5,7 @@ services:
     image: uscdev/wordpress-selenium-test
     hostname: wordpress-selenium-test
     networks:
-#    - selenium
-    - test
+    - selenium
     deploy:
       replicas: 1
       update_config:
@@ -17,6 +16,4 @@ services:
 
 networks:
   selenium:
-    external: true
-  test:
     external: true

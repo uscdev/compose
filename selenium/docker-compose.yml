@@ -4,13 +4,10 @@ services:
   selenium:
     image: selenium/hub
     hostname: selenium
-    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
+    entrypoint: bash -c 'SE_OPTS="-host 0.0.0.0 -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
     networks:
-    - guacamole # No - use selenium-nodes
-#    - selenium-nodes
-#    - selenium
-    - test
-    - proxy
+    - selenium
+    - selenium-nodes
     ports:
     - "4444:4444"
     deploy:
@@ -24,22 +21,22 @@ services:
   chrome:
     image: selenium/node-chrome-debug
     hostname: chrome
-    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
+    entrypoint: bash -c 'SE_OPTS="-host 0.0.0.0 -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
     depends_on:
     - selenium
     ports:
     - "5556:5555"
     - "5901:5900"
-    shm_size: "2g"
+#    shm_size: "2g"
     environment:
     - HUB_HOST=selenium
     - HUB_PORT=4444
     - NODE_MAX_SESSION=1
-#    volumes:
-#    - /dev/shm:/dev/shm
+    volumes:
+    - /dev/shm:/dev/shm
     networks:
-#    - selenium-nodes
-    - guacamole
+    - test
+    - selenium-nodes
     deploy:
       replicas: 1
       update_config:
@@ -51,7 +48,7 @@ services:
   firefox:
     image: selenium/node-firefox-debug
     hostname: firefox
-    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
+    entrypoint: bash -c 'SE_OPTS="-host 0.0.0.0 -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
     shm_size: "2g"
     depends_on:
     - selenium
@@ -63,8 +60,10 @@ services:
     - HUB_PORT=4444
     - NODE_MAX_SESSION=1
     networks:
-#    - selenium-nodes
-    - guacamole
+    - test
+    - selenium-nodes
+    volumes:
+    - /dev/shm:/dev/shm
     deploy:
       replicas: 1
       update_config:
@@ -74,13 +73,10 @@ services:
         condition: on-failure
 
 networks:
-  selenium-nodes:
-    driver: overlay
+  default:
   selenium:
-    external: true
-  guacamole:
-    external: true
-  proxy:
     external: true
   test:
     external: true
+  selenium-nodes:
+    driver: overlay
