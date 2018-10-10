@@ -4,11 +4,10 @@ services:
   selenium:
     image: selenium/hub
     hostname: selenium
-    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
+    entrypoint: bash -c 'SE_OPTS="-host 0.0.0.0 -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
     networks:
-    - selenium-nodes
     - selenium
-    - proxy
+    - selenium-nodes
     ports:
     - "4444:4444"
     deploy:
@@ -25,11 +24,11 @@ services:
   chrome:
     image: selenium/node-chrome-debug
     hostname: chrome
-#    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
-    entrypoint: >
-      bash -c '
-        export IP_ADDRESS=$$(ip addr show eth0 | grep "inet\b" | awk '"'"'{print $$2}'"'"' | awk -F/ '"'"'{print $$1}'"'"' | head -1) &&
-        SE_OPTS="-host $$IP_ADDRESS"  /usr/bin/supervisord --configuration /etc/supervisord.conf'
+    entrypoint: bash -c 'SE_OPTS="-host 0.0.0.0 -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
+#    entrypoint: >
+#      bash -c '
+#        export IP_ADDRESS=$$(ip addr show eth0 | grep "inet\b" | awk '"'"'{print $$2}'"'"' | awk -F/ '"'"'{print $$1}'"'"' | head -1) &&
+#        SE_OPTS="-host $$IP_ADDRESS"  /usr/bin/supervisord --configuration /etc/supervisord.conf'
     volumes:
     - /dev/urandom:/dev/random
     - /dev/shm:/dev/shm
@@ -46,9 +45,8 @@ services:
     - "5901:5900"
 #    shm_size: "2g"
     networks:
-    - selenium-nodes
-    - guacamole
     - test
+    - selenium-nodes
     deploy:
       mode: replicated
       replicas: 1
@@ -67,22 +65,31 @@ services:
   firefox:
     image: selenium/node-firefox-debug
     hostname: firefox
-#    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
-    entrypoint: >
-      bash -c '
-        export IP_ADDRESS=$$HOSTNAME &&
-        SE_OPTS="-host $$IP_ADDRESS"  /usr/bin/supervisord --configuration /etc/supervisord.conf'
+    entrypoint: bash -c 'SE_OPTS="-host 0.0.0.0 -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
+#    entrypoint: >
+#      bash -c '
+#        export IP_ADDRESS=$$HOSTNAME &&
+#        SE_OPTS="-host $$IP_ADDRESS"  /usr/bin/supervisord --configuration /etc/supervisord.conf'
     volumes:
     - /dev/shm:/dev/shm
     - /dev/urandom:/dev/random
+#    shm_size: "2g"
+    depends_on:
+    - selenium
+    ports:
+    - "5557:5555"
+    - "5902:5900"
     environment:
     - HUB_HOST=selenium
     - HUB_PORT=4444
     - HUB_PORT_4444_TCP_ADDR=hub
     - HUB_PORT_4444_TCP_PORT=4444
     - NODE_MAX_SESSION=1
-    depends_on:
-    - selenium
+    networks:
+    - test
+    - selenium-nodes
+    volumes:
+    - /dev/shm:/dev/shm
     deploy:
       mode: replicated
       replicas: 1
@@ -95,23 +102,12 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
-    ports:
-    - "5557:5555"
-    - "5902:5900"
-#    shm_size: "2g"
-    networks:
-    - selenium-nodes
-    - guacamole
-    - test
 
 networks:
-  selenium-nodes:
-    driver: overlay
+  default:
   selenium:
-    external: true
-  guacamole:
-    external: true
-  proxy:
     external: true
   test:
     external: true
+  selenium-nodes:
+    driver: overlay

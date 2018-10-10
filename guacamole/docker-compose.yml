@@ -25,7 +25,7 @@ services:
       labels:
       - com.df.notify=true
       - com.df.distribute=true
-      - com.df.port=80
+      - com.df.port=8080
       - com.df.xForwardedProto=true
       - com.df.httpsOnly=true
       - com.df.serviceDomain=guacamole.swarm.usc.edu
@@ -40,7 +40,7 @@ services:
     image: guacamole/guacd
     hostname: guacd
     networks:
-    - guacamole
+    - test
     - guacd
     ports:
     - "4822:4822"
@@ -79,7 +79,7 @@ networks:
     driver: overlay
   proxy:
     external: true
-  guacamole:
+  test:
     external: true
 
 volumes:
