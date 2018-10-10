@@ -12,6 +12,9 @@ services:
     - "4444:4444"
     deploy:
       replicas: 1
+      labels:
+        selenium.grid.type: "hub"
+        selenium.grid.hub: "true"
       update_config:
         parallelism: 1
         delay: 10s
@@ -22,34 +25,55 @@ services:
     image: selenium/node-chrome-debug
     hostname: chrome
     entrypoint: bash -c 'SE_OPTS="-host 0.0.0.0 -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
+#    entrypoint: >
+#      bash -c '
+#        export IP_ADDRESS=$$(ip addr show eth0 | grep "inet\b" | awk '"'"'{print $$2}'"'"' | awk -F/ '"'"'{print $$1}'"'"' | head -1) &&
+#        SE_OPTS="-host $$IP_ADDRESS"  /usr/bin/supervisord --configuration /etc/supervisord.conf'
+    volumes:
+    - /dev/urandom:/dev/random
+    - /dev/shm:/dev/shm
+    environment:
+    - HUB_HOST=selenium
+    - HUB_PORT=4444
+    - NODE_MAX_SESSION=1
+    - HUB_PORT_4444_TCP_ADDR=hub
+    - HUB_PORT_4444_TCP_PORT=4444
     depends_on:
     - selenium
     ports:
     - "5556:5555"
     - "5901:5900"
 #    shm_size: "2g"
-    environment:
-    - HUB_HOST=selenium
-    - HUB_PORT=4444
-    - NODE_MAX_SESSION=1
-    volumes:
-    - /dev/shm:/dev/shm
     networks:
     - test
     - selenium-nodes
     deploy:
+      mode: replicated
       replicas: 1
+      labels:
+        selenium.grid.type: "node"
+        selenium.grid.node: "true"
+        selenium.grid.node.type: "chrome"
       update_config:
         parallelism: 1
         delay: 10s
       restart_policy:
         condition: on-failure
+#      placement:
+#        constraints: [node.role == worker]
 
   firefox:
     image: selenium/node-firefox-debug
     hostname: firefox
     entrypoint: bash -c 'SE_OPTS="-host 0.0.0.0 -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
-    shm_size: "2g"
+#    entrypoint: >
+#      bash -c '
+#        export IP_ADDRESS=$$HOSTNAME &&
+#        SE_OPTS="-host $$IP_ADDRESS"  /usr/bin/supervisord --configuration /etc/supervisord.conf'
+    volumes:
+    - /dev/shm:/dev/shm
+    - /dev/urandom:/dev/random
+#    shm_size: "2g"
     depends_on:
     - selenium
     ports:
@@ -58,6 +82,8 @@ services:
     environment:
     - HUB_HOST=selenium
     - HUB_PORT=4444
+    - HUB_PORT_4444_TCP_ADDR=hub
+    - HUB_PORT_4444_TCP_PORT=4444
     - NODE_MAX_SESSION=1
     networks:
     - test
@@ -65,7 +91,12 @@ services:
     volumes:
     - /dev/shm:/dev/shm
     deploy:
+      mode: replicated
       replicas: 1
+      labels:
+        selenium.grid.type: "node"
+        selenium.grid.node: "true"
+        selenium.grid.node.type: "firefox"
       update_config:
         parallelism: 1
         delay: 10s
