@@ -1,11 +1,13 @@
 version: "3.7"
 services:
 
-  seleniumhub:
+  selenium:
     image: selenium/hub
+    hostname: selenium
+    entrypoint: bash -c 'SE_OPTS="-host 0.0.0.0 -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
     networks:
-    - seleniumhub
     - selenium
+    - selenium-nodes
     ports:
     - "4444:4444"
     deploy:
@@ -18,18 +20,23 @@ services:
 
   chrome:
     image: selenium/node-chrome-debug
+    hostname: chrome
+    entrypoint: bash -c 'SE_OPTS="-host 0.0.0.0 -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
     depends_on:
-    - seleniumhub
+    - selenium
     ports:
     - "5556:5555"
     - "5901:5900"
+#    shm_size: "2g"
     environment:
-    - HUB_HOST=seleniumhub
+    - HUB_HOST=selenium
     - HUB_PORT=4444
+    - NODE_MAX_SESSION=1
+    volumes:
+    - /dev/shm:/dev/shm
     networks:
-    - seleniumhub
-    - proxy
-    - guacamole
+    - test
+    - selenium-nodes
     deploy:
       replicas: 1
       update_config:
@@ -40,18 +47,23 @@ services:
 
   firefox:
     image: selenium/node-firefox-debug
+    hostname: firefox
+    entrypoint: bash -c 'SE_OPTS="-host 0.0.0.0 -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
+    shm_size: "2g"
     depends_on:
-    - seleniumhub
+    - selenium
     ports:
     - "5557:5555"
     - "5902:5900"
     environment:
-    - HUB_HOST=seleniumhub
+    - HUB_HOST=selenium
     - HUB_PORT=4444
+    - NODE_MAX_SESSION=1
     networks:
-    - seleniumhub
-    - proxy
-    - guacamole
+    - test
+    - selenium-nodes
+    volumes:
+    - /dev/shm:/dev/shm
     deploy:
       replicas: 1
       update_config:
@@ -61,11 +73,10 @@ services:
         condition: on-failure
 
 networks:
+  default:
   selenium:
+    external: true
+  test:
+    external: true
+  selenium-nodes:
     driver: overlay
-  seleniumhub:
-    external: true
-  guacamole:
-    external: true
-  proxy:
-    external: true

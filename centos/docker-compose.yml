@@ -1,13 +1,13 @@
 version: '3.7'
 services:
 
-  ubuntu1:
-    image: ubuntu
-    hostname: ubuntu1
+  centos1:
+    image: centos
+    hostname: centos1
     command: sleep 36000
     networks:
-    - ubuntu1
-    - ubuntu2
+    - centos1
+    - centos2
     deploy:
       replicas: 1
       update_config:
@@ -16,13 +16,13 @@ services:
       restart_policy:
         condition: on-failure
 
-  ubuntu2:
-    image: ubuntu
-    hostname: ubuntu2
+  centos2:
+    image: centos
+    hostname: centos2
     command: sleep 36000
     networks:
-    - ubuntu1
-    - ubuntu3
+    - centos1
+    - centos3
     deploy:
       replicas: 1
       update_config:
@@ -31,13 +31,13 @@ services:
       restart_policy:
         condition: on-failure
 
-  ubuntu3:
-    image: ubuntu
-    hostname: ubuntu3
+  centos3:
+    image: centos
+    hostname: centos3
     command: sleep 36000
     networks:
-    - ubuntu2
-    - ubuntu3
+    - centos2
+    - centos3
     deploy:
       replicas: 1
       update_config:
@@ -47,9 +47,9 @@ services:
         condition: on-failure
 
 networks:
-  ubuntu1:
+  centos1:
     driver: overlay
-  ubuntu2:
+  centos2:
     driver: overlay
-  ubuntu3:
+  centos3:
     driver: overlay
