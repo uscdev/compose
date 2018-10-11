@@ -1,0 +1,19 @@
+version: '3.7'
+services:
+
+  wordpress-selenium-test:
+    image: uscdev/wordpress-selenium-test
+    hostname: wordpress-selenium-test
+    networks:
+    - selenium
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: none
+
+networks:
+  selenium:
+    external: true
