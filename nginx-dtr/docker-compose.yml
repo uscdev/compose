@@ -7,8 +7,8 @@ services:
     networks:
       - proxy
     secrets:
-      - docker.usc.edu.key
-      - docker.usc.edu.cer
+      - cloud.usc.edu.key
+      - cloud.usc.edu.cer
     deploy:
       replicas: 1
       update_config:
@@ -27,7 +27,7 @@ networks:
   proxy:
     external: true
 secrets:
-  docker.usc.edu.key:
+  cloud.usc.edu.key:
     external: true
-  docker.usc.edu.cer:
+  cloud.usc.edu.cer:
     external: true

@@ -40,10 +40,14 @@ networks:
     external: true
 secrets:
 <<<<<<< HEAD
+<<<<<<< HEAD
   cert-cloud.usc.edu.pem:
 =======
   cert-docker.usc.edu.pem:
 >>>>>>> master
+=======
+  cert-cloud.usc.edu.pem:
+>>>>>>> c502726f93b42d7ef617db350ae99977bec8089e
     external: true
   cert-emailchoice.usc.edu.pem:
     external: true

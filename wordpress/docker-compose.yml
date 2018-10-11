@@ -1,4 +1,8 @@
 version: '3.7'
+<<<<<<< HEAD
+=======
+services:
+>>>>>>> c502726f93b42d7ef617db350ae99977bec8089e
 
   wordpress:
     image: wordpress:4.8.1
@@ -59,6 +63,7 @@ networks:
 
 volumes:
   wordpress-db:
+<<<<<<< HEAD
     external: true
 #    driver: cloudstor:aws
 #    driver_opts:
@@ -66,6 +71,15 @@ volumes:
 #      size: 25
 #      iops: 1000
 #      backing: relocatable
+=======
+#    driver: cloudstor:aws
+#    driver_opts:
+#      ebstype: io1
+#      size: 25
+#      iops: 1000
+#      backing: relocatable
+    external: true
+>>>>>>> c502726f93b42d7ef617db350ae99977bec8089e
   wordpress-data:
     external: true
 #    external:
