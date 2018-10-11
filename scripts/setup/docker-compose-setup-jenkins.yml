@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  ubuntu:
+    image: ubuntu
+    volumes:
+    - jenkins-data:/var/jenkins_home
+    command: chown -R 1000 /var/jenkins_home && chgrp -R 1000 /var/jenkins_home
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: none
+volumes:
+  jenkins-data:
+    external: true

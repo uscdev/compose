@@ -1,24 +1,26 @@
-version: '3.4'
-services:
+version: '3.7'
+
   wordpress:
     image: wordpress:4.8.1
+    hostname: wordpress
 #    ports:
 #      - 8101:80
     depends_on:
-      - db
+    - db
     networks:
-      - wordpress-db
-      - proxy
+    - proxy
+    - db
+    - test
     volumes:
-      - wordpress-data:/var/www/html
+    - wordpress-data:/var/www/html
     deploy:
       labels:
-        - com.df.notify=true
-        - com.df.distribute=true
-        - com.df.port=80
-        - com.df.xForwardedProto=true
-        - com.df.httpsOnly=true
-        - com.df.serviceDomain=wordpress.swarm.usc.edu
+      - com.df.notify=true
+      - com.df.distribute=true
+      - com.df.port=80
+      - com.df.xForwardedProto=true
+      - com.df.httpsOnly=true
+      - com.df.serviceDomain=wordpress.swarm.usc.edu
       replicas: 2
       update_config:
         parallelism: 1
@@ -26,31 +28,44 @@ services:
       restart_policy:
         condition: on-failure
     environment:
-      - WORDPRESS_DB_PASSWORD=passw0rd
-      - WORDPRESS_DB_HOST=db
-      - ServerName=wordpress.docker.usc.edu
+    - WORDPRESS_DB_PASSWORD=passw0rd
+    - WORDPRESS_DB_HOST=db
+    - ServerName=wordpress.docker.usc.edu
+
   db:
-    image: mysql
+    image: mysql:5.7
+    hostname: db
     environment:
       MYSQL_ROOT_PASSWORD: passw0rd
     networks:
-      - wordpress-db
+    - db
     volumes:
-      - wordpress-db:/var/lib/mysql
+    - wordpress-db:/var/lib/mysql
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
 networks:
-  wordpress-db:
-    driver: overlay
   proxy:
-    external:
-      name: proxy
+    external: true
+  test:
+    external: true
+  db:
+    driver: overlay
+
 volumes:
   wordpress-db:
-    driver: cloudstor:aws
-    driver_opts:
-      ebstype: io1
-      size: 25
-      iops: 1000
-      backing: relocatable
+    external: true
+#    driver: cloudstor:aws
+#    driver_opts:
+#      ebstype: io1
+#      size: 25
+#      iops: 1000
+#      backing: relocatable
   wordpress-data:
     external: true
 #    external:

@@ -39,7 +39,11 @@ networks:
   proxy:
     external: true
 secrets:
+<<<<<<< HEAD
   cert-cloud.usc.edu.pem:
+=======
+  cert-docker.usc.edu.pem:
+>>>>>>> master
     external: true
   cert-emailchoice.usc.edu.pem:
     external: true

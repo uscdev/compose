@@ -1,0 +1,88 @@
+version: '3.7'
+services:
+
+  guacamole:
+    image: guacamole/guacamole
+    hostname: guacamole
+    ports:
+    - 8080:8080
+    depends_on:
+    - guacd
+    - db
+    networks:
+    - proxy
+    - guacd
+    - db
+    environment:
+    - "GUACD_HOSTNAME=guacd"
+    - "GUACD_PORT=4822"
+    - "GUACAMOLE_HOME=/home"
+    - "MYSQL_HOSTNAME=db"
+    - "MYSQL_DATABASE=guacamole_db"
+    - "MYSQL_USER=guacamole_user"
+    - "MYSQL_PASSWORD=password"
+    deploy:
+      labels:
+      - com.df.notify=true
+      - com.df.distribute=true
+      - com.df.port=8080
+      - com.df.xForwardedProto=true
+      - com.df.httpsOnly=true
+      - com.df.serviceDomain=guacamole.swarm.usc.edu
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  guacd:
+    image: guacamole/guacd
+    hostname: guacd
+    networks:
+    - test
+    - guacd
+    ports:
+    - "4822:4822"
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  db:
+    image: mysql:5.7
+    hostname: db
+    networks:
+    - db
+    volumes:
+    - db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: guacamole_db
+      MYSQL_USER: guacamole_user
+      MYSQL_PASSWORD: password
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+networks:
+  guacd:
+    driver: overlay
+  db:
+    driver: overlay
+  proxy:
+    external: true
+  test:
+    external: true
+
+volumes:
+  db:
+    external: true
+    name: guacamole-db
