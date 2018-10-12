@@ -1,60 +1,106 @@
-version: '3.1'
+version: '3.7'
 
 services:
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.0
     ports:
       - "9200:9200"
       - "9300:9300"
+    configs:
+      - source: elastic_config
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
-      # disable X-Pack
-      # see https://www.elastic.co/guide/en/x-pack/current/xpack-settings.html
-      #     https://www.elastic.co/guide/en/x-pack/current/installing-xpack.html#xpack-enabling
-      xpack.security.enabled: "false"
-      xpack.monitoring.enabled: "false"
-      xpack.graph.enabled: "false"
-      xpack.watcher.enabled: "false"
     networks:
       - elk
+    deploy:
+      mode: replicated
+      replicas: 1
 
   logstash:
-    image: docker.elastic.co/logstash/logstash
-    volumes:
-      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
-      - ./logstash/pipeline:/usr/share/logstash/pipeline
+    image: docker.elastic.co/logstash/logstash-oss:6.4.0
     ports:
       - "5000:5000"
+      - "9600:9600"
+    configs:
+      - source: logstash_config
+        target: /usr/share/logstash/config/logstash.yml
+      - source: logstash_pipeline
+        target: /usr/share/logstash/pipeline/logstash.conf
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
     networks:
       - elk
-    depends_on:
-      - elasticsearch
+    deploy:
+      mode: replicated
+      replicas: 1
 
   kibana:
-    build: docker.elastic.co/kibana/kibana
-    volumes:
-      - ./kibana/config/:/usr/share/kibana/config
+    image: docker.elastic.co/kibana/kibana-oss:6.4.0
     ports:
       - "5601:5601"
+    configs:
+      - source: kibana_config
+        target: /usr/share/kibana/config/kibana.yml
     networks:
       - elk
-    depends_on:
-      - elasticsearch
+      - proxy
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+      - com.df.notify=true
+      - com.df.distribute=true
+      - com.df.httpsOnly.1=true
+      - com.df.serviceDomain.1=elk.swarm.usc.edu
+      - com.df.port.1=5601
+      - com.df.httpsOnly.2=true
+      - com.df.serviceDomain.2=kibana.swarm.usc.edu
+      - com.df.port.2=5601
 
   logspout:
-    image: gliderlabs/logspout
-#    command: syslog://logstash:51415
+    image: registry.docker.usc.edu/logspout:latest
+#    image: gliderlabs/logspout:latest
     networks:
-      - elk
-#    mode 
-#      - global
-#    --mount "type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock"
-#    -e SYSLOG_FORMAT=rfc3164 \
+    - elk
+#    - logging
+    volumes:
+    - /etc/hostname:/etc/host_hostname:ro
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+#    command:
+#      logstash://logstash:5000
+    deploy:
+      mode: global
+      resources:
+        limits:
+          cpus: '0.20'
+          memory: 256M
+        reservations:
+          cpus: '0.10'
+          memory: 128M
+      restart_policy:
+        condition: on-failure
+
+    environment:
+      ROUTE_URIS: logstash://logstash:5000
+      LOGSTASH_TAGS: docker-elk
+    depends_on:
+    - logstash
+
+configs:
+
+  elastic_config:
+    file: ./elasticsearch/config/elasticsearch.yml
+  logstash_config:
+    file: ./logstash/config/logstash.yml
+  logstash_pipeline:
+    file: ./logstash/pipeline/logstash.conf
+  kibana_config:
+    file: ./kibana/config/kibana.yml
 
 networks:
-
   elk:
-    driver: bridge
+    driver: overlay
+  proxy:
+    external: true
