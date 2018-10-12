@@ -45,6 +45,7 @@ services:
         target: /usr/share/kibana/config/kibana.yml
     networks:
       - elk
+      - proxy
     deploy:
       mode: replicated
       replicas: 1
@@ -53,10 +54,10 @@ services:
       - com.df.distribute=true
       - com.df.httpsOnly.1=true
       - com.df.serviceDomain.1=elk.swarm.usc.edu
-      - com.df.port.1=80
+      - com.df.port.1=5601
       - com.df.httpsOnly.2=true
       - com.df.serviceDomain.2=kibana.swarm.usc.edu
-      - com.df.port.2=80
+      - com.df.port.2=5601
 
   logspout:
     image: registry.docker.usc.edu/logspout:latest
@@ -101,5 +102,5 @@ configs:
 networks:
   elk:
     driver: overlay
-#  logging:
-#    external: true
+  proxy:
+    external: true
