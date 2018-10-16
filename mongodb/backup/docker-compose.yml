@@ -4,8 +4,6 @@ services:
     image: mongo
     ports:
     - 27017:27017
-    volumes:
-    - mongodb:/data/db
     deploy:
       replicas: 1
       update_config:
@@ -33,7 +31,5 @@ services:
       restart_policy:
         condition: on-failure
 volumes:
-  mongodb:
-    external: true
   backup:
     external: true
