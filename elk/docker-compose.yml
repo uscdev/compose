@@ -2,8 +2,26 @@ version: '3.7'
 
 services:
 
+  logstash:
+    image: docker.elastic.co/logstash/logstash-oss:${ELK_VERSION:-6.4.0}
+    ports:
+    - "5000:5000"
+    - "9600:9600"
+    configs:
+    - source: logstash_config
+      target: /usr/share/logstash/config/logstash.yml
+    - source: logstash_pipeline
+      target: /usr/share/logstash/pipeline/logstash.conf
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+    - elk
+    deploy:
+      mode: replicated
+      replicas: 1
+
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.0
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:${ELK_VERSION:-6.4.0}
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -14,30 +32,14 @@ services:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
     networks:
       - elk
-    deploy:
-      mode: replicated
-      replicas: 1
-
-  logstash:
-    image: docker.elastic.co/logstash/logstash-oss:6.4.0
-    ports:
-      - "5000:5000"
-      - "9600:9600"
-    configs:
-      - source: logstash_config
-        target: /usr/share/logstash/config/logstash.yml
-      - source: logstash_pipeline
-        target: /usr/share/logstash/pipeline/logstash.conf
-    environment:
-      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
-    networks:
-      - elk
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
     deploy:
       mode: replicated
       replicas: 1
 
   kibana:
-    image: docker.elastic.co/kibana/kibana-oss:6.4.0
+    image: docker.elastic.co/kibana/kibana-oss:${ELK_VERSION:-6.4.0}
     ports:
       - "5601:5601"
     configs:
@@ -88,8 +90,11 @@ services:
     depends_on:
     - logstash
 
-configs:
+volumes:
+  elasticsearch:
+    external: true
 
+configs:
   elastic_config:
     file: ./elasticsearch/config/elasticsearch.yml
   logstash_config:
