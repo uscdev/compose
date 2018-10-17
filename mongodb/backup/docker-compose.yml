@@ -1,0 +1,35 @@
+version: '3.7'
+services:
+  mongodb:
+    image: mongo
+    ports:
+    - 27017:27017
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+  mongo-backup:
+    image: uscdev/mongo-backup
+    environment:
+#      BACKUP_OUTPUT: "/data/backup"
+      # Run backup at 4:00am
+      BACKUP_CRON_EXP: "* * * * *"
+      # Delete backups that are over 15 days
+#      BACKUP_TTL: 15
+      MONGO_HOST: mongodb
+#      MONGO_PORT: 27017
+    volumes:
+    - backup:/data/backup
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+volumes:
+  backup:
+    external: true
