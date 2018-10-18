@@ -39,7 +39,7 @@ networks:
   proxy:
     external: true
 secrets:
-  cert-docker.usc.edu.pem:
+  cert-swarm-test.usc.edu.pem:
     external: true
   cert-emailchoice.usc.edu.pem:
     external: true
