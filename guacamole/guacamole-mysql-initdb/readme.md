@@ -8,4 +8,5 @@ It will populate the guacamole database with initial values.
 ````bash
 docker run --rm guacamole/guacamole /opt/guacamole/bin/initdb.sh --mysql > initdb.sh
 docker build -t uscdev/guacamole-mysql-initdb:5.7 .
+docker push uscdev/guacamole-mysql-initdb:5.7
 ````
