@@ -2,81 +2,57 @@ version: "3.7"
 
 services:
 
-  node-exporter:
-    image: stefanprodan/swarmprom-node-exporter:v0.15.2
-    networks:
-    - default
-    environment:
-    - NODE_ID={{.Node.ID}}
-    volumes:
-    - /proc:/host/proc:ro
-    - /sys:/host/sys:ro
-    - /:/rootfs:ro
-    - /etc/hostname:/etc/nodename
-    command:
-    - '--path.sysfs=/host/sys'
-    - '--path.procfs=/host/proc'
-    - '--collector.textfile.directory=/etc/node-exporter/'
-    - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
-    # no collectors are explicitely enabled here, because the defaults are just fine,
-    # see https://github.com/prometheus/node_exporter
-    # disable ipvs collector because it barfs the node-exporter logs full with errors on my centos 7 vm's
-    - '--no-collector.ipvs'
-    deploy:
-      mode: global
-      resources:
-        limits:
-          memory: 128M
-        reservations:
-          memory: 64M
-
-  cadvisor:
-    image: google/cadvisor
-    networks:
-    - default
-    command: -logtostderr -docker_only
-    volumes:
-    - /var/run/docker.sock:/var/run/docker.sock:ro
-    - /:/rootfs:ro
-    - /var/run:/var/run
-    - /sys:/sys:ro
-    - /var/lib/docker/:/var/lib/docker:ro
-    deploy:
-      mode: global
-      resources:
-        limits:
-          memory: 128M
-        reservations:
-          memory: 64M
-
   prometheus:
-    image: vfarcic/prometheus-devops21
+    image: dockerflow/docker-flow-monitor:${TAG:-latest}
     networks:
-    - default
     - proxy
+    - monitor
     ports:
     - 9091:9090
+    environment:
+#    - ARG_STORAGE_LOCAL_PATH=/data
+    - ARG_WEB_EXTERNAL-URL=http://$DOMAIN
+    - LISTENER_ADDRESS=swarm-listener
+    - ARG_ALERTMANAGER_URL=http://alert-manager:9093
+    - GLOBAL_SCRAPE_INTERVAL=10s
+#    - ARG_WEB_ROUTE-PREFIX=/monitor
     deploy:
       labels:
       - com.df.notify=true
       - com.df.distribute=true
-      - com.df.port=9090
-      - com.df.httpsOnly=true
       - com.df.serviceDomain=prometheus.docker.usc.edu
-      - com.df.xForwardedProto=true
+      - com.df.port=9090
+      - com.df.alertName=memlimit
+      - com.df.alertIf=@service_mem_limit:0.8
+      - com.df.alertFor=30s
+#      - com.df.serviceDomain=${DOMAIN:-localhost}
+#      - com.df.httpsOnly=true
+#      - com.df.serviceDomain=prometheus.docker.usc.edu
+#      - com.df.xForwardedProto=true
+      resources:
+        reservations:
+          memory: 1000M
+        limits:
+          memory: 1500M
       mode: replicated
       replicas: 1
+
+  alert-manager:
+    image: prom/alertmanager
+    command: -config.file=/run/secrets/alert_manager_config -storage.path=/alertmanager
+    networks:
+    - monitor
+#    secrets:
+#    - alert_manager_config
 
   grafana:
     image: stefanprodan/swarmprom-grafana:5.0.1
     networks:
-    - default
-    - proxy
+    - monitor
     environment:
     - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
     - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
     - GF_USERS_ALLOW_SIGN_UP=false
-#    - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
     #- GF_SERVER_ROOT_URL=${GF_SERVER_ROOT_URL:-localhost}
     #- GF_SMTP_ENABLED=${GF_SMTP_ENABLED:-false}
     #- GF_SMTP_FROM_ADDRESS=${GF_SMTP_FROM_ADDRESS:-grafana@test.com}
@@ -86,17 +62,9 @@ services:
     #- GF_SMTP_PASSWORD=${GF_SMTP_PASSWORD}
     volumes:
     - grafana:/var/lib/grafana
+    ports:
+      - 3000:3000
     deploy:
-      labels:
-      - com.df.notify=true
-      - com.df.distribute=true
-#     - com.df.servicePath=/grafana/,/grafana/public,/grafana/api
-#      - com.df.reqPathSearch=/grafana/
-#      - com.df.reqPathReplace=/
-      - com.df.port=3000
-#      - com.df.httpsOnly=true
-      - com.df.serviceDomain=grafana.docker.usc.edu
-      - com.df.xForwardedProto=true
       mode: replicated
       replicas: 1
       placement:
@@ -108,15 +76,75 @@ services:
         reservations:
           memory: 64M
 
+  cadvisor:
+    image: google/cadvisor:${CADVISOR_TAG:-latest}
+    networks:
+    - monitor
+    command: -logtostderr -docker_only
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    - /:/rootfs:ro
+    - /var/run:/var/run
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
+    deploy:
+      mode: global
+      labels:
+      - com.df.notify=true
+      - com.df.scrapePort=8080
+      - com.df.alertName=memlimit
+      - com.df.alertIf=@service_mem_limit:0.8
+      - com.df.alertFor=30s
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+
+  node-exporter:
+    image: basi/node-exporter:${NODE_EXPORTER_TAG:-v1.14.0}
+    command: '-collector.procfs /host/proc -collector.sysfs /host/sys -collector.filesystem.ignored-mount-points "^/(sys|proc|dev|host|etc)($$|/)" -collector.textfile.directory /etc/node-exporter/ -collectors.enabled="conntrack,diskstats,entropy,filefd,filesystem,loadavg,mdadm,meminfo,netdev,netstat,stat,textfile,time,vmstat,ipvs"'
+    networks:
+    - monitor
+    environment:
+    - HOST_HOSTNAME=/etc/host_hostname
+    - LOGSPOUT=ignore
+    - NODE_ID={{.Node.ID}}
+    volumes:
+    - /proc:/host/proc
+    - /sys:/host/sys
+    - /:/rootfs
+    - /etc/hostname:/etc/host_hostname
+    deploy:
+      mode: global
+      labels:
+      - com.df.notify=true
+      - com.df.scrapePort=9100
+      - com.df.alertName.1=memload
+      - com.df.alertIf.1=@node_mem_limit:0.9
+      - com.df.alertFor.1=30s
+      - com.df.alertName.2=memlimit
+      - com.df.alertIf.2=@service_mem_limit:0.8
+      - com.df.alertFor.2=30s
+      resources:
+        reservations:
+          memory: 30M
+        limits:
+          memory: 50M
+
 networks:
-  default:
-    external: false
-  logging_default:
+  monitor:
     external: true
   proxy:
+    external: true
+  logging_default:
     external: true
 
 volumes:
   prometheus: {}
   grafana: {}
   alertmanager: {}
+
+#secrets:
+#  alert_manager_config:
+#    external: true
