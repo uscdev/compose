@@ -1,0 +1,101 @@
+version: "3.7"
+
+services:
+
+  node-exporter:
+    image: basi/node-exporter:v0.1.1
+    networks:
+    - default
+    volumes:
+    - /proc:/host/proc
+    - /sys:/host/sys
+    - /:/rootfs
+    - /etc/hostname:/etc/host_hostname
+    environment:
+    - HOST_HOSTNAME=/etc/host_hostname
+    command: '-collector.procfs /host/proc -collector.sysfs /host/sys -collector.filesystem.ignored-mount-points "^/(sys|proc|dev|host|etc)($$|/)" -collector.textfile.directory /etc/node-exporter/ -collectors.enabled="conntrack,diskstats,entropy,filefd,filesystem,loadavg,mdadm,meminfo,netdev,netstat,stat,textfile,time,vmstat,ipvs"'
+    deploy:
+      mode: global
+
+  cadvisor:
+    image: google/cadvisor:v0.24.1
+    networks:
+    - default
+    volumes:
+    - /:/rootfs
+    - /var/run:/var/run
+    - /sys:/sys
+    - /var/lib/docker:/var/lib/docker
+    deploy:
+      mode: global
+
+#  dockerd-exporter:
+#    image: stefanprodan/caddy
+#    networks:
+#    - net
+#    environment:
+#    - DOCKER_GWBRIDGE_IP=172.18.0.1
+#    configs:
+#    - source: dockerd_config
+#      target: /etc/caddy/Caddyfile
+#    deploy:
+#      mode: global
+#      resources:
+#        limits:
+#          memory: 128M
+#        reservations:
+#          memory: 64M
+
+  prometheus:
+    image: prom/prometheus
+    networks:
+      - default
+    ports:
+      - 9091:9090
+    volumes:
+#      - /tmp/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+#    deploy:
+#      labels:
+#      - com.df.notify=true
+#      - com.df.distribute=true
+#      - com.df.servicePath=/grafana/,/grafana/public,/grafana/api
+#      - com.df.reqPathSearch=/grafana/
+#      - com.df.reqPathReplace=/
+#      - com.df.port=9091
+#      - com.df.httpsOnly=true
+#      - com.df.serviceDomain=prometheus.docker.usc.edu
+
+  grafana:
+    image: grafana/grafana:${GRAFANA_TAG:-4.5.2}
+    networks:
+    - default
+    - logging_default
+    - proxy
+    environment:
+    - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
+    - GF_SECURITY_ADMIN_USER=${USER:-admin}
+    - GF_SECURITY_ADMIN_PASSWORD=${PASS:-admin}
+    deploy:
+      labels:
+      - com.df.notify=true
+      - com.df.distribute=true
+      - com.df.servicePath=/grafana/,/grafana/public,/grafana/api
+      - com.df.reqPathSearch=/grafana/
+      - com.df.reqPathReplace=/
+      - com.df.port=3000
+      - com.df.httpsOnly=true
+      - com.df.serviceDomain=grafana.docker.usc.edu
+      - com.df.xForwardedProto=true
+
+networks:
+  default:
+    external: false
+  logging_default:
+    external: true
+  proxy:
+    external: true
+
+volumes:
+  prometheus-data:
+    external: true

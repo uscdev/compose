@@ -3,90 +3,110 @@ version: "3.7"
 services:
 
   node-exporter:
-    image: basi/node-exporter:v0.1.1
+    image: stefanprodan/swarmprom-node-exporter:v0.15.2
     networks:
     - default
-    volumes:
-    - /proc:/host/proc
-    - /sys:/host/sys
-    - /:/rootfs
-    - /etc/hostname:/etc/host_hostname
     environment:
-    - HOST_HOSTNAME=/etc/host_hostname
-    command: '-collector.procfs /host/proc -collector.sysfs /host/sys -collector.filesystem.ignored-mount-points "^/(sys|proc|dev|host|etc)($$|/)" -collector.textfile.directory /etc/node-exporter/ -collectors.enabled="conntrack,diskstats,entropy,filefd,filesystem,loadavg,mdadm,meminfo,netdev,netstat,stat,textfile,time,vmstat,ipvs"'
+    - NODE_ID={{.Node.ID}}
+    volumes:
+    - /proc:/host/proc:ro
+    - /sys:/host/sys:ro
+    - /:/rootfs:ro
+    - /etc/hostname:/etc/nodename
+    command:
+    - '--path.sysfs=/host/sys'
+    - '--path.procfs=/host/proc'
+    - '--collector.textfile.directory=/etc/node-exporter/'
+    - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+    # no collectors are explicitely enabled here, because the defaults are just fine,
+    # see https://github.com/prometheus/node_exporter
+    # disable ipvs collector because it barfs the node-exporter logs full with errors on my centos 7 vm's
+    - '--no-collector.ipvs'
     deploy:
       mode: global
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
 
   cadvisor:
-    image: google/cadvisor:v0.24.1
+    image: google/cadvisor
     networks:
     - default
+    command: -logtostderr -docker_only
     volumes:
-    - /:/rootfs
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    - /:/rootfs:ro
     - /var/run:/var/run
-    - /sys:/sys
-    - /var/lib/docker:/var/lib/docker
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
     deploy:
       mode: global
-
-#  dockerd-exporter:
-#    image: stefanprodan/caddy
-#    networks:
-#    - net
-#    environment:
-#    - DOCKER_GWBRIDGE_IP=172.18.0.1
-#    configs:
-#    - source: dockerd_config
-#      target: /etc/caddy/Caddyfile
-#    deploy:
-#      mode: global
-#      resources:
-#        limits:
-#          memory: 128M
-#        reservations:
-#          memory: 64M
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
 
   prometheus:
-    image: prom/prometheus
-    networks:
-      - default
-    ports:
-      - 9091:9090
-    volumes:
-#      - /tmp/prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus-data:/prometheus
-#    deploy:
-#      labels:
-#      - com.df.notify=true
-#      - com.df.distribute=true
-#      - com.df.servicePath=/grafana/,/grafana/public,/grafana/api
-#      - com.df.reqPathSearch=/grafana/
-#      - com.df.reqPathReplace=/
-#      - com.df.port=9091
-#      - com.df.httpsOnly=true
-#      - com.df.serviceDomain=prometheus.docker.usc.edu
-
-  grafana:
-    image: grafana/grafana:${GRAFANA_TAG:-4.5.2}
+    image: vfarcic/prometheus-devops21
     networks:
     - default
-    - logging_default
     - proxy
-    environment:
-    - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
-    - GF_SECURITY_ADMIN_USER=${USER:-admin}
-    - GF_SECURITY_ADMIN_PASSWORD=${PASS:-admin}
+    ports:
+    - 9091:9090
     deploy:
       labels:
       - com.df.notify=true
       - com.df.distribute=true
-      - com.df.servicePath=/grafana/,/grafana/public,/grafana/api
-      - com.df.reqPathSearch=/grafana/
-      - com.df.reqPathReplace=/
-      - com.df.port=3000
+      - com.df.port=9090
       - com.df.httpsOnly=true
+      - com.df.serviceDomain=prometheus.docker.usc.edu
+      - com.df.xForwardedProto=true
+      mode: replicated
+      replicas: 1
+
+  grafana:
+    image: stefanprodan/swarmprom-grafana:5.0.1
+    networks:
+    - default
+    - proxy
+    environment:
+    - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+    - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+    - GF_USERS_ALLOW_SIGN_UP=false
+#    - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
+    #- GF_SERVER_ROOT_URL=${GF_SERVER_ROOT_URL:-localhost}
+    #- GF_SMTP_ENABLED=${GF_SMTP_ENABLED:-false}
+    #- GF_SMTP_FROM_ADDRESS=${GF_SMTP_FROM_ADDRESS:-grafana@test.com}
+    #- GF_SMTP_FROM_NAME=${GF_SMTP_FROM_NAME:-Grafana}
+    #- GF_SMTP_HOST=${GF_SMTP_HOST:-smtp:25}
+    #- GF_SMTP_USER=${GF_SMTP_USER}
+    #- GF_SMTP_PASSWORD=${GF_SMTP_PASSWORD}
+    volumes:
+    - grafana:/var/lib/grafana
+    deploy:
+      labels:
+      - com.df.notify=true
+      - com.df.distribute=true
+#     - com.df.servicePath=/grafana/,/grafana/public,/grafana/api
+#      - com.df.reqPathSearch=/grafana/
+#      - com.df.reqPathReplace=/
+      - com.df.port=3000
+#      - com.df.httpsOnly=true
       - com.df.serviceDomain=grafana.docker.usc.edu
       - com.df.xForwardedProto=true
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+        - node.role == manager
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
 
 networks:
   default:
@@ -97,5 +117,6 @@ networks:
     external: true
 
 volumes:
-  prometheus-data:
-    external: true
+  prometheus: {}
+  grafana: {}
+  alertmanager: {}
