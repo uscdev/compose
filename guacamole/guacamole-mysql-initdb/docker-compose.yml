@@ -1,0 +1,25 @@
+version: '3.7'
+services:
+
+  db:
+    image: uscdev/guacamole-mysql-initdb:5.7
+    hostname: db
+    volumes:
+    - db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: guacamole_db
+      MYSQL_USER: guacamole_user
+      MYSQL_PASSWORD: password
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  db:
+    external: true
+    name: guacamole-db

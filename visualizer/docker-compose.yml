@@ -1,8 +1,11 @@
-version: '3.4'
+version: '3'
 
 services:
+
   visualizer:
     image: dockersamples/visualizer
+    environment:
+    - CTX_ROOT=/
     networks:
       - proxy
     deploy:
@@ -12,7 +15,7 @@ services:
         - com.df.distribute=true
         - com.df.httpsOnly=true
         - com.df.port=8080
-        - com.df.serviceDomain=visualizer.swarm.usc.edu
+        - com.df.serviceDomain=visualizer.docker.usc.edu
       placement:
         constraints: [node.role == manager]
     volumes:
