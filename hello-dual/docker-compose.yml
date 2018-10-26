@@ -1,21 +1,59 @@
-version: '3.2'
+version: '3.7'
 
 services:
-  helloworld:
-    image: tutum/hello-world
+  helloworld1:
+    hostname: helloworld1
+    image: mendhak/http-https-echo
     networks:
-      - proxy
+    - proxy
     deploy:
       replicas: 2
       labels:
-        - com.df.notify=true
-        - com.df.distribute=true
-        - com.df.httpsOnly.1=true
-        - com.df.serviceDomain.1=hello-world.cloud.usc.edu
-        - com.df.port.1=80
-        - com.df.httpsOnly.2=true
-        - com.df.serviceDomain.2=helloworld.cloud.usc.edu
-        - com.df.port.2=80
+      - com.df.notify=true
+      - com.df.distribute=true
+      - com.df.httpsOnly.1=true
+      - com.df.serviceDomain.1=hello-world.cloud.usc.edu
+      - com.df.port.1=80
+      - com.df.httpsOnly.2=true
+      - com.df.serviceDomain.2=helloworld.cloud.usc.edu
+      - com.df.port.2=80
+  helloworld2:
+    hostname: helloworld2
+    image: mendhak/http-https-echo
+    networks:
+    - proxy
+    deploy:
+      replicas: 1
+      labels:
+      - com.df.notify=true
+      - com.df.distribute=true
+      - com.df.httpsOnly.1=true
+      - com.df.servicePath.1=/hello-world
+      - com.df.reqPathSearchReplace.1=/hello-world,/goodbye
+      - com.df.port.1=80
+      - com.df.httpsOnly.2=true
+      - com.df.servicePath.2=/helloworld
+      - com.df.port.2=80
+  helloworld3:
+    hostname: helloworld3
+    image: mendhak/http-https-echo
+    networks:
+    - proxy
+    deploy:
+      replicas: 1
+      labels:
+      - com.df.notify=true
+      - com.df.distribute=true
+      - com.df.httpsOnly.1=true
+      - com.df.serviceDomain.1=bye.cloud.usc.edu
+      - com.df.servicePath.1=/bye
+      - com.df.reqPathSearch=/grafana/
+      - com.df.reqPathReplace=/
+      - com.df.port.1=80
+      - com.df.httpsOnly.2=true
+      - com.df.serviceDomain.1=hello.cloud.usc.edu
+      - com.df.servicePath.2=/hello
+      - com.df.port.2=80
 networks:
   proxy:
     external: true
