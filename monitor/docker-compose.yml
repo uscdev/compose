@@ -2,6 +2,28 @@ version: "3.7"
 
 services:
 
+  swarm-listener:
+    image: dockerflow/docker-flow-swarm-listener
+    networks:
+    - monitor
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+    - DF_NOTIFY_CREATE_SERVICE_URL=http://prometheus:8080/v1/docker-flow-monitor/reconfigure
+    - DF_NOTIFY_REMOVE_SERVICE_URL=http://prometheus:8080/v1/docker-flow-monitor/remove
+    deploy:
+      labels:
+      - com.df.alertName=memlimit
+      - com.df.alertIf=@service_mem_limit:0.8
+      - com.df.alertFor=30s
+      placement:
+        constraints: [node.role == manager]
+      resources:
+        reservations:
+          memory: 10M
+        limits:
+          memory: 20M
+
   prometheus:
     image: dockerflow/docker-flow-monitor:${PROMETHEUS_TAG:-latest}
     networks:
