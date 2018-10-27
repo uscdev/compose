@@ -3,7 +3,7 @@ version: "3.7"
 services:
 
   prometheus:
-    image: dockerflow/docker-flow-monitor:${TAG:-latest}
+    image: dockerflow/docker-flow-monitor:${PROMETHEUS_TAG:-latest}
     networks:
     - proxy
     - monitor
@@ -11,7 +11,7 @@ services:
     - 9091:9090
     environment:
     #    - ARG_STORAGE_LOCAL_PATH=/data
-    - ARG_WEB_EXTERNAL-URL=http://$DOMAIN
+    - ARG_WEB_EXTERNAL-URL=https://${PROMETHEUS_DOMAIN:-prometheus.docker.usc.edu}
     - LISTENER_ADDRESS=swarm-listener
     - ARG_ALERTMANAGER_URL=http://alert-manager:9093
     - GLOBAL_SCRAPE_INTERVAL=10s
@@ -20,15 +20,18 @@ services:
       labels:
       - com.df.notify=true
       - com.df.distribute=true
-      - com.df.serviceDomain=prometheus.docker.usc.edu
-      - com.df.port=9090
+      - com.df.serviceDomain.1=${PROMETHEUS_DOMAIN:-prometheus.docker.usc.edu}
+      - com.df.port.1=9090
+      - com.df.xForwardedProto.1=true
+      - com.df.httpsOnly.1=true
+      - com.df.servicePath.2=${PROMETHEUS_PATH:-/prometheus}
+      - com.df.port.2=9090
+      - com.df.reqPathSearchReplace.2=${PROMETHEUS_PATH:-/prometheus},/
+      - com.df.xForwardedProto.2=true
+      - com.df.httpsOnly.2=true
       - com.df.alertName=memlimit
       - com.df.alertIf=@service_mem_limit:0.8
       - com.df.alertFor=30s
-      #      - com.df.serviceDomain=${DOMAIN:-localhost}
-      #      - com.df.httpsOnly=true
-      #      - com.df.serviceDomain=prometheus.docker.usc.edu
-      #      - com.df.xForwardedProto=true
       resources:
         reservations:
           memory: 1000M
@@ -39,27 +42,108 @@ services:
 
   alert-manager:
     image: prom/alertmanager
-    command: -config.file=/run/secrets/alert_manager_config -storage.path=/alertmanager
+    command:
+    - '--config.file=/run/secrets/alert_manager_config'
+    - '--storage.path=/alertmanager'
+    volumes:
+    - alertmanager:/alertmanager
+    environment:
+    - SLACK_URL=${SLACK_URL:-https://hooks.slack.com/services/TOKEN}
+    - SLACK_CHANNEL=${SLACK_CHANNEL:-general}
+    - SLACK_USER=${SLACK_USER:-alertmanager}
     networks:
     - monitor
-  #    secrets:
-  #    - alert_manager_config
+    secrets:
+    - alert_manager_config
+    ports:
+      - 9093:9093
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+        - node.role == manager
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+      labels:
+      - com.df.notify=true
+      - com.df.distribute=true
+      - com.df.serviceDomain.1=${ALERT_MANAGER_DOMAIN:-alert-manager.docker.usc.edu}
+      - com.df.port.1=9093
+      - com.df.xForwardedProto.1=true
+      - com.df.httpsOnly.1=true
+      - com.df.servicePath.2=${ALERT_MANAGER_PATH:-/alert-manager}
+      - com.df.port.2=9093
+      - com.df.reqPathSearchReplace.2=${ALERT_MANAGER_PATH:-/alert-manager},/
+      - com.df.xForwardedProto.2=true
+      - com.df.httpsOnly.2=true
+      - com.df.alertName=memlimit
+      - com.df.alertIf=@service_mem_limit:0.8
+      - com.df.alertFor=30s
 
-  grafana:
-    image: stefanprodan/swarmprom-grafana:5.0.1
+  unsee:
+    image: cloudflare/unsee:${UNSEE_TAG:-v0.8.0}
     networks:
     - monitor
     environment:
-    - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
-    - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
-    - GF_USERS_ALLOW_SIGN_UP=false
-    #- GF_SERVER_ROOT_URL=${GF_SERVER_ROOT_URL:-localhost}
-    #- GF_SMTP_ENABLED=${GF_SMTP_ENABLED:-false}
-    #- GF_SMTP_FROM_ADDRESS=${GF_SMTP_FROM_ADDRESS:-grafana@test.com}
-    #- GF_SMTP_FROM_NAME=${GF_SMTP_FROM_NAME:-Grafana}
-    #- GF_SMTP_HOST=${GF_SMTP_HOST:-smtp:25}
-    #- GF_SMTP_USER=${GF_SMTP_USER}
-    #- GF_SMTP_PASSWORD=${GF_SMTP_PASSWORD}
+    - "ALERTMANAGER_URIS=default:http://alert-manager:9093"
+    ports:
+    - 9094:8080
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+      - com.df.notify=true
+      - com.df.distribute=true
+      - com.df.serviceDomain.1=${UNSEE_DOMAIN:-unsee.docker.usc.edu}
+      - com.df.port.1=8080
+      - com.df.xForwardedProto.1=true
+      - com.df.httpsOnly.1=true
+      - com.df.servicePath.2=${UNSEE_PATH:-/unsee}
+      - com.df.port.2=8080
+      - com.df.reqPathSearchReplace.2=${UNSEE_PATH:-/unsee},/
+      - com.df.xForwardedProto.2=true
+      - com.df.httpsOnly.2=true
+      - com.df.alertName=memlimit
+      - com.df.alertIf=@service_mem_limit:0.8
+      - com.df.alertFor=30s
+
+  grafana:
+    image: grafana/grafana:${GRAFANA_TAG:-5.0.1}
+    networks:
+    - monitor
+    configs:
+    - source: grafana_datasources_prometheus
+      target: /etc/grafana/provisioning/datasources/prometheus.yaml
+      mode: 0664
+    - source: grafana_dashboards
+      target: /etc/grafana/provisioning/dashboards/swarmprom_dashboards.yml
+      mode: 0664
+    - source: nodes_dashboard
+      target: /etc/grafana/dashboards/swarmprom-nodes-dash.json
+      mode: 0664
+    - source: services_dashboard
+      target: /etc/grafana/dashboards/swarmprom-services-dash.json
+      mode: 0664
+    - source: prometheus_dashboard
+      target: /etc/grafana/dashboards/swarmprom-prometheus-dash.json
+      mode: 0664
+    environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning/
+#      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
+      #- GF_SERVER_ROOT_URL=${GF_SERVER_ROOT_URL:-localhost}
+      #- GF_SMTP_ENABLED=${GF_SMTP_ENABLED:-false}
+      #- GF_SMTP_FROM_ADDRESS=${GF_SMTP_FROM_ADDRESS:-grafana@test.com}
+      #- GF_SMTP_FROM_NAME=${GF_SMTP_FROM_NAME:-Grafana}
+      #- GF_SMTP_HOST=${GF_SMTP_HOST:-smtp:25}
+      #- GF_SMTP_USER=${GF_SMTP_USER}
+      #- GF_SMTP_PASSWORD=${GF_SMTP_PASSWORD}
     volumes:
     - grafana:/var/lib/grafana
     ports:
@@ -75,6 +159,22 @@ services:
           memory: 128M
         reservations:
           memory: 64M
+      labels:
+      - com.df.notify=true
+      - com.df.distribute=true
+      - com.df.serviceDomain.1=${GRAFANA_DOMAIN:-grafana.docker.usc.edu}
+      - com.df.port.1=3000
+      - com.df.xForwardedProto.1=true
+      - com.df.httpsOnly.1=true
+      - com.df.port.2=3000
+      - com.df.servicePath.2=/grafana/,/grafana/public,/grafana/api
+      - com.df.reqPathSearch.2=/grafana/
+      - com.df.reqPathReplace.2=/
+      - com.df.xForwardedProto.2=true
+      - com.df.httpsOnly.2=true
+      - com.df.alertName=memlimit
+      - com.df.alertIf=@service_mem_limit:0.8
+      - com.df.alertFor=30s
 
   cadvisor:
     image: google/cadvisor:${CADVISOR_TAG:-latest}
@@ -102,8 +202,17 @@ services:
           memory: 64M
 
   node-exporter:
-    image: basi/node-exporter:${NODE_EXPORTER_TAG:-v1.14.0}
-    command: '-collector.procfs /host/proc -collector.sysfs /host/sys -collector.filesystem.ignored-mount-points "^/(sys|proc|dev|host|etc)($$|/)" -collector.textfile.directory /etc/node-exporter/ -collectors.enabled="conntrack,diskstats,entropy,filefd,filesystem,loadavg,mdadm,meminfo,netdev,netstat,stat,textfile,time,vmstat,ipvs"'
+    image: uscdev/node-exporter:${NODE_EXPORTER_TAG:-v0.15.2}
+    command:
+    - '--path.procfs=/host/proc'
+    - '--path.sysfs=/host/sys'
+    - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+    - '--collector.textfile.directory=/etc/node-exporter/'
+    # - '--collectors.enabled="conntrack,diskstats,entropy,filefd,filesystem,loadavg,mdadm,meminfo,netdev,netstat,stat,textfile,time,vmstat,ipvs"'
+    # no collectors are explicitely enabled here, because the defaults are just fine,
+    # see https://github.com/prometheus/node_exporter
+    # disable ipvs collector because it barfs the node-exporter logs full with errors on my centos 7 vm's
+    - '--no-collector.ipvs'
     networks:
     - monitor
     environment:
@@ -111,10 +220,11 @@ services:
     - LOGSPOUT=ignore
     - NODE_ID={{.Node.ID}}
     volumes:
-    - /proc:/host/proc
-    - /sys:/host/sys
-    - /:/rootfs
-    - /etc/hostname:/etc/host_hostname
+    - /proc:/host/proc:ro
+    - /sys:/host/sys:ro
+    - /:/rootfs:ro
+#    - /etc/hostname:/etc/host_hostname
+    - /etc/hostname:/etc/nodename
     deploy:
       mode: global
       labels:
@@ -132,19 +242,48 @@ services:
         limits:
           memory: 50M
 
+# See docker.com / configure-and-run-prometheus
+#  dockerd-exporter:
+#    image: stefanprodan/caddy
+#    networks:
+#    - net
+#    environment:
+#    - DOCKER_GWBRIDGE_IP=172.18.0.1
+#    configs:
+#    - source: dockerd_config
+#      target: /etc/caddy/Caddyfile
+#    deploy:
+#      mode: global
+#      resources:
+#        limits:
+#          memory: 128M
+#        reservations:
+#          memory: 64M
+
 networks:
   monitor:
     external: true
   proxy:
     external: true
-  logging_default:
-    external: true
 
 volumes:
-  prometheus: {}
+#  prometheus: {}
   grafana: {}
   alertmanager: {}
 
-#secrets:
-#  alert_manager_config:
+configs:
+  grafana_datasources_prometheus:
+    file: ./grafana/datasources/prometheus.yaml
+  grafana_dashboards:
+    file: ./grafana/dashboards.yml
+  nodes_dashboard:
+    file: ./grafana/dashboards/nodes-dashboard.json
+  services_dashboard:
+    file: ./grafana/dashboards/services-dashboard.json
+  prometheus_dashboard:
+    file: ./grafana/dashboards/prometheus-dashboard.json
+
+secrets:
+  alert_manager_config:
 #    external: true
+    file: ./alertmanager/config/alert_manager_config

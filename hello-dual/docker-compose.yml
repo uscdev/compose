@@ -47,8 +47,7 @@ services:
       - com.df.httpsOnly.1=true
       - com.df.serviceDomain.1=bye.cloud.usc.edu
       - com.df.servicePath.1=/bye
-      - com.df.reqPathSearch=/grafana/
-      - com.df.reqPathReplace=/
+      - com.df.reqPathSearchReplace=/hello/,/
       - com.df.port.1=80
       - com.df.httpsOnly.2=true
       - com.df.serviceDomain.1=hello.cloud.usc.edu
