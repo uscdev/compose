@@ -23,7 +23,7 @@ services:
       labels:
       - com.df.notify=true
       - com.df.distribute=true
-      - com.df.serviceDomain=hello-shib-iis.swarm-test.usc.edu
+      - com.df.serviceDomain=hello-shib-iis.${DOMAIN_NAME:-docker.usc.edu}
       - com.df.httpsOnly=true
       - com.df.port=443
       - com.df.sslVerifyNone=true
@@ -37,10 +37,10 @@ services:
         - com.df.notify=true
         - com.df.distribute=true
         - com.df.httpsOnly.1=true
-        - com.df.serviceDomain.1=hello-world-iis.swarm-test.usc.edu
+        - com.df.serviceDomain.1=hello-world-iis.${DOMAIN_NAME:-docker.usc.edu}
         - com.df.port.1=80
         - com.df.httpsOnly.2=true
-        - com.df.serviceDomain.2=hello-iis.swarm-test.usc.edu
+        - com.df.serviceDomain.2=hello-iis.${DOMAIN_NAME:-docker.usc.edu}
         - com.df.port.2=80
 networks:
   proxy:

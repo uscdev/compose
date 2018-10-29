@@ -29,11 +29,13 @@ services:
     networks:
     - proxy
     - monitor
+#    volumes:
+#    - prometheus:/prometheus
     ports:
     - 9091:9090
     environment:
     #    - ARG_STORAGE_LOCAL_PATH=/data
-    - ARG_WEB_EXTERNAL-URL=https://${PROMETHEUS_DOMAIN:-prometheus.docker.usc.edu}
+    - ARG_WEB_EXTERNAL-URL=https://${PROMETHEUS_SUB_DOMAIN:-prometheus}.${DOMAIN_NAME:-docker.usc.edu}
     - LISTENER_ADDRESS=swarm-listener
     - ARG_ALERTMANAGER_URL=http://alert-manager:9093
     - GLOBAL_SCRAPE_INTERVAL=10s
@@ -42,7 +44,7 @@ services:
       labels:
       - com.df.notify=true
       - com.df.distribute=true
-      - com.df.serviceDomain.1=${PROMETHEUS_DOMAIN:-prometheus.docker.usc.edu}
+      - com.df.serviceDomain.1=${PROMETHEUS_SUB_DOMAIN:-prometheus}.${DOMAIN_NAME:-docker.usc.edu}
       - com.df.port.1=9090
       - com.df.xForwardedProto.1=true
       - com.df.httpsOnly.1=true
@@ -93,7 +95,7 @@ services:
       labels:
       - com.df.notify=true
       - com.df.distribute=true
-      - com.df.serviceDomain.1=${ALERT_MANAGER_DOMAIN:-alert-manager.docker.usc.edu}
+      - com.df.serviceDomain.1=${ALERT_MANAGER_SUB_DOMAIN:-alert-manager}.${DOMAIN_NAME:-docker.usc.edu}
       - com.df.port.1=9093
       - com.df.xForwardedProto.1=true
       - com.df.httpsOnly.1=true
@@ -120,7 +122,7 @@ services:
       labels:
       - com.df.notify=true
       - com.df.distribute=true
-      - com.df.serviceDomain.1=${UNSEE_DOMAIN:-unsee.docker.usc.edu}
+      - com.df.serviceDomain.1=${UNSEE_SUB_DOMAIN:-unsee}.${DOMAIN_NAME:-docker.usc.edu}
       - com.df.port.1=8080
       - com.df.xForwardedProto.1=true
       - com.df.httpsOnly.1=true
@@ -184,7 +186,7 @@ services:
       labels:
       - com.df.notify=true
       - com.df.distribute=true
-      - com.df.serviceDomain.1=${GRAFANA_DOMAIN:-grafana.docker.usc.edu}
+      - com.df.serviceDomain.1=${GRAFANA_SUB_DOMAIN:-grafana}.${DOMAIN_NAME:-docker.usc.edu}
       - com.df.port.1=3000
       - com.df.xForwardedProto.1=true
       - com.df.httpsOnly.1=true
@@ -289,9 +291,12 @@ networks:
     external: true
 
 volumes:
-#  prometheus: {}
-  grafana: {}
-  alertmanager: {}
+#  prometheus:
+#    external: true
+  grafana:
+    external: true
+  alertmanager:
+    external: true
 
 configs:
   grafana_datasources_prometheus:

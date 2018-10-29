@@ -19,7 +19,7 @@ services:
     deploy:
       replicas: 3
     secrets:
-      - cert-docker.usc.edu.pem
+      - cert-site.pem
       - cert-emailchoice.usc.edu.pem
       - cert-workday-account-translator.usc.edu.pem
       - cert-itapps.usc.edu.pem
@@ -34,8 +34,6 @@ services:
     environment:
     - DF_NOTIFY_CREATE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/reconfigure
     - DF_NOTIFY_REMOVE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/remove
-#    - DF_NOTIFY_CREATE_SERVICE_URL=http://prometheus:8080/v1/docker-flow-monitor/reconfigure,http://proxy:8080/v1/docker-flow-proxy/reconfigure
-#    - DF_NOTIFY_REMOVE_SERVICE_URL=http://prometheus:8080/v1/docker-flow-monitor/remove,http://proxy:8080/v1/docker-flow-proxy/remove
     deploy:
       labels:
       - com.df.alertName=memlimit
@@ -58,8 +56,9 @@ networks:
     external: true
 
 secrets:
-  cert-docker.usc.edu.pem:
+  cert-site.pem:
     external: true
+    name: cert-${DOMAIN_NAME:-docker.usc.edu}.pem
   cert-emailchoice.usc.edu.pem:
     external: true
   cert-workday-account-translator.usc.edu.pem:

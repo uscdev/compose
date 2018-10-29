@@ -21,7 +21,7 @@ services:
         - com.df.distribute=true
         - com.df.httpsOnly=true
         - com.df.port=8442
-        - com.df.serviceDomain=dtr.swarm.usc.edu
+        - com.df.serviceDomain=dtr.${DOMAIN_NAME:-docker.usc.edu}
         - com.df.sslVerifyNone=true
 networks:
   proxy:
