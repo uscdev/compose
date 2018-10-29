@@ -28,7 +28,7 @@ services:
       - com.df.port=8080
       - com.df.xForwardedProto=true
       - com.df.httpsOnly=true
-      - com.df.serviceDomain=guacamole.swarm.usc.edu
+      - com.df.serviceDomain=guacamole.${DOMAIN_NAME:-docker.usc.edu}
       replicas: 1
       update_config:
         parallelism: 1

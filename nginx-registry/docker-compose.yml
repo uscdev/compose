@@ -21,7 +21,7 @@ services:
         - com.df.distribute=true
         - com.df.httpsOnly=true
         - com.df.port=8445
-        - com.df.serviceDomain=registry.swarm.usc.edu
+        - com.df.serviceDomain=registry.${DOMAIN_NAME:-docker.usc.edu}
         - com.df.sslVerifyNone=true
 networks:
   proxy:

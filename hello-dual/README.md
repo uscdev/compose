@@ -17,7 +17,7 @@ services:
       labels:
         - com.df.notify=true
         - com.df.distribute=true
-        - com.df.serviceDomain=hello-world.docker.usc.edu
+        - com.df.serviceDomain=hello-world.${DOMAIN_NAME:-docker.usc.edu}
         - com.df.port=80
 networks:
   proxy:

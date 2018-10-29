@@ -44,6 +44,7 @@ docker secret create swarm-key-pair.pem $SECRET_PATH/keys/aws/ssh/usc/its-bsa-de
 docker secret create its-bsa-dev-us-west-2-key-pair.pem $SECRET_PATH/keys/aws/ssh/usc/its-bsa-dev-1-us-west-2.pem
 
 docker network create --driver overlay proxy
+docker network create --driver overlay monitor
 
 docker volume create -d "cloudstor:aws" \
   --opt size=10 \
@@ -63,3 +64,13 @@ docker volume create -d "cloudstor:aws" \
   --opt size=30 \
   --opt backing=relocatable \
   nexus-data
+
+docker volume create -d "cloudstor:aws" \
+  --opt size=30 \
+  --opt backing=relocatable \
+  grafana
+
+docker volume create -d "cloudstor:aws" \
+  --opt size=30 \
+  --opt backing=relocatable \
+  alert-manager
