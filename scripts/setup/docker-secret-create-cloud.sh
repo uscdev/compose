@@ -36,3 +36,4 @@ export DOMAIN_NAME=$SITE.usc.edu
 docker secret create $DOMAIN_NAME-cert.pem $PEM_PATH/$DOMAIN_NAME/haproxy/cert-$DOMAIN_NAME.pem
 
 docker network create --driver overlay proxy
+docker network create --driver overlay monitor

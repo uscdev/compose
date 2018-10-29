@@ -23,9 +23,6 @@ services:
       labels:
       - com.df.distribute=true
       - com.df.notify=true
-#      - com.df.httpsOnly=true
-#      - com.df.serviceDomain=elasticsearch.docker.usc.edu
-#      - com.df.port=80
       - com.df.alertName=memlimit
       - com.df.alertIf=@service_mem_limit:0.8
       - com.df.alertFor=30s
@@ -85,13 +82,24 @@ services:
       labels:
       - com.df.notify=true
       - com.df.distribute=true
-      - com.df.httpsOnly.1=true
-      - com.df.serviceDomain.1=elk.docker.usc.edu
+      - com.df.serviceDomain.1=${ELK_SUB_DOMAIN:-elk}.${DOMAIN_NAME:-docker.usc.edu}
       - com.df.port.1=5601
-      - com.df.httpsOnly.2=true
-      - com.df.serviceDomain.2=kibana.docker.usc.edu
+      - com.df.xForwardedProto.1=true
+      - com.df.httpsOnly.1=true
+      - com.df.servicePath.2=${ELK_PATH:-/elk}
       - com.df.port.2=5601
-#      - com.df.servicePath=/app,/elasticsearch,/api,/ui,/bundles,/plugins,/status,/es_admin
+      - com.df.reqPathSearchReplace.2=${ELK_PATH:-/elk},/
+      - com.df.xForwardedProto.2=true
+      - com.df.httpsOnly.2=true
+      - com.df.serviceDomain.3=${KIBANA_SUB_DOMAIN:-kibana}.${DOMAIN_NAME:-docker.usc.edu}
+      - com.df.port.3=5601
+      - com.df.xForwardedProto.3=true
+      - com.df.httpsOnly.3=true
+      - com.df.servicePath.4=${KIBANA_PATH:-/kibana}
+      - com.df.port.4=5601
+      - com.df.reqPathSearchReplace.4=${KIBANA_PATH:-/kibana},/
+      - com.df.xForwardedProto.4=true
+      - com.df.httpsOnly.4=true
       - com.df.alertName=memlimit
       - com.df.alertIf=@service_mem_limit:0.8
       - com.df.alertFor=30s
