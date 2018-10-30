@@ -9,7 +9,6 @@ services:
     - 443:443
     networks:
     - proxy
-    - monitor
     environment:
       LISTENER_ADDRESS: swarm-listener
       MODE: swarm
@@ -27,8 +26,6 @@ services:
 
   swarm-listener:
     image: dockerflow/docker-flow-swarm-listener
-    networks:
-    - monitor
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock
     environment:
@@ -52,9 +49,6 @@ networks:
     external: true
 #    driver: overlay
 #    attachable: true
-  monitor:
-    external: true
-
 secrets:
   cert-site.pem:
     external: true
