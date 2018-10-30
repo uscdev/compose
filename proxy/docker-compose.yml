@@ -16,7 +16,7 @@ services:
       SSL_BIND_CIPHERS: ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256
       CONNECTION_MODE: ${CONNECTION_MODE:-http-keep-alive}
     deploy:
-      replicas: 3
+      replicas: 1
     secrets:
       - cert-site.pem
       - cert-emailchoice.usc.edu.pem
@@ -26,6 +26,8 @@ services:
 
   swarm-listener:
     image: dockerflow/docker-flow-swarm-listener
+    networks:
+    - proxy
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock
     environment:
