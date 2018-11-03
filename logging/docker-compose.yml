@@ -23,6 +23,9 @@ services:
       labels:
       - com.df.distribute=true
       - com.df.notify=true
+#      - com.df.httpsOnly=true
+#      - com.df.serviceDomain=elasticsearch.docker.usc.edu
+#      - com.df.port=80
       - com.df.alertName=memlimit
       - com.df.alertIf=@service_mem_limit:0.8
       - com.df.alertFor=30s
@@ -103,6 +106,13 @@ services:
       - com.df.alertName=memlimit
       - com.df.alertIf=@service_mem_limit:0.8
       - com.df.alertFor=30s
+#      - com.df.httpsOnly.1=true
+#      - com.df.serviceDomain.1=elk.docker.usc.edu
+#      - com.df.port.1=5601
+#      - com.df.httpsOnly.2=true
+#      - com.df.serviceDomain.2=kibana.docker.usc.edu
+#      - com.df.port.2=5601
+##      - com.df.servicePath=/app,/elasticsearch,/api,/ui,/bundles,/plugins,/status,/es_admin
 
   logspout:
     image: gliderlabs/logspout:${LOGSPOUT_VERSION:-v3.2.2}
