@@ -20,6 +20,8 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      restart_policy:
+        condition: on-failure
       labels:
       - com.df.distribute=true
       - com.df.notify=true
@@ -50,6 +52,8 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      restart_policy:
+        condition: on-failure
       labels:
       - com.df.distribute=true
       - com.df.notify=true
@@ -79,6 +83,8 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      restart_policy:
+        condition: on-failure
       labels:
       - com.df.notify=true
       - com.df.distribute=true
