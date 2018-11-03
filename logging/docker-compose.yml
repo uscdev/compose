@@ -45,6 +45,7 @@ services:
     #Internal network for the containers
     networks:
     - logging
+    - proxy
     deploy:
       mode: replicated
       replicas: 1
@@ -54,6 +55,8 @@ services:
       - com.df.distribute=true
       - com.df.notify=true
       - com.df.port=80
+      - com.df.httpsOnly=true
+      - com.df.serviceDomain=elasticsearch.docker.usc.edu
       - com.df.alertName=memlimit
       - com.df.alertIf=@service_mem_limit:0.8
       - com.df.alertFor=30s
@@ -75,6 +78,7 @@ services:
     ports: ['5601:5601']
     networks:
     - logging
+    - proxy
     #We don't start Kibana until the ES instance is ready
     depends_on:
     - elasticsearch
@@ -91,7 +95,25 @@ services:
       labels:
       - com.df.distribute=true
       - com.df.notify=true
-      - com.df.port=80
+      - com.df.serviceDomain.1=${ELK_SUB_DOMAIN:-elk}.${DOMAIN_NAME:-docker.usc.edu}
+      - com.df.port.1=5601
+      - com.df.xForwardedProto.1=true
+      - com.df.httpsOnly.1=true
+      - com.df.servicePath.2=${ELK_PATH:-/elk}
+      - com.df.port.2=5601
+      - com.df.reqPathSearchReplace.2=${ELK_PATH:-/elk},/
+      - com.df.xForwardedProto.2=true
+      - com.df.httpsOnly.2=true
+      - com.df.serviceDomain.3=${KIBANA_SUB_DOMAIN:-kibana}.${DOMAIN_NAME:-docker.usc.edu}
+      - com.df.port.3=5601
+      - com.df.xForwardedProto.3=true
+      - com.df.httpsOnly.3=true
+      - com.df.servicePath.4=${KIBANA_PATH:-/kibana}
+      - com.df.port.4=5601
+      - com.df.reqPathSearchReplace.4=${KIBANA_PATH:-/kibana},/
+      - com.df.xForwardedProto.4=true
+      - com.df.httpsOnly.4=true
+#      - com.df.servicePath=/app,/elasticsearch,/api,/ui,/bundles,/plugins,/status,/es_admin
       - com.df.alertName=memlimit
       - com.df.alertIf=@service_mem_limit:0.8
       - com.df.alertFor=30s
@@ -147,19 +169,13 @@ services:
     - source: prospectors_config
       target: /usr/share/filebeat/prospectors.d/docker.yml
     volumes:
-      #Mount the nginx logs into the filebeat container so we can access and index them using the filebeat nginx module
-      - logs-nginx:/var/log/nginx/
-      #Mount the apache2 logs into the filebeat container so we can access and index them using the filebeat apache2 module
-      - logs-apache2:/var/log/apache2/
-      #Mount the mysql logs into the filebeat container so we can access and and index them using the filebeat mysql module
-      - logs-mysql:/var/log/mysql/
       #Mount the hosts system log directory. This represents the logs of the VM hosting docker. Consumed by the filebeat system module.
       - /var/log/:/var/log/host/
       #:ro
       #Mount the docker logs for indexing by the custom prospector ./config/filebeat/prospectors.d
       - /var/lib/docker/containers:/hostfs/var/lib/docker/containers
       #Named volume fsdata. This is used to persist the registry file between restarts, so to avoid data duplication
-      - fbdata:/usr/share/filebeat/data/
+      - filebeat-data:/usr/share/filebeat/data/
     networks:
     - logging
     command: filebeat -e -E output.elasticsearch.username=elastic -E output.elasticsearch.password=${ES_PASSWORD:-changeme} -strict.perms=false
@@ -194,14 +210,8 @@ services:
     - source: metricbeat_config
       target: /usr/share/metricbeat/metricbeat.yml
       #Mount the modules.d directory into the container. This allows user to potentially make changes to the modules and they will be dynamically loaded.
-    - source: metricbeat_apache_config
-      target: /usr/share/metricbeat/modules.d/apache.yml
     - source: metricbeat_docker_config
       target: /usr/share/metricbeat/modules.d/docker.yml
-    - source: metricbeat_mysql_config
-      target: /usr/share/metricbeat/modules.d/mysql.yml
-    - source: metricbeat_nginx_config
-      target: /usr/share/metricbeat/modules.d/nginx.yml
     - source: metricbeat_system_config
       target: /usr/share/metricbeat/modules.d/system.yml
     volumes:
@@ -274,90 +284,6 @@ services:
       - com.df.alertIf=@service_mem_limit:0.8
       - com.df.alertFor=30s
 
-  #Nginx container
-  nginx:
-#    container_name: nginx
-    hostname: nginx
-#    build: ${PWD}/config/nginx
-    image: uscdev/nginx
-    networks:
-    - logging
-    #Expose port 80 to allow users to hit content and generate data for filebeat and packetbeat
-    ports: ['80:80']
-    command: nginx -g 'daemon off;'
-    volumes:
-      #Logs are mounted to a relative path. These are also accessed by Filebeat and consumed by the Nginx module
-      - logs-nginx:/var/log/nginx/
-    deploy:
-      mode: replicated
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-      labels:
-      - com.df.distribute=true
-      - com.df.notify=true
-      - com.df.port=80
-      - com.df.alertName=memlimit
-      - com.df.alertIf=@service_mem_limit:0.8
-      - com.df.alertFor=30s
-
-  #Apache2 container
-  apache2:
-#    container_name: apache2
-    hostname: apache2
-#    build: ${PWD}/config/apache2
-    image: uscdev/apache2
-    networks:
-    - logging
-    #Expose port 80 as port 800 to allow users to hit content and generate data for filebeat and packetbeat
-    ports: ['8000:80']
-    volumes:
-      #Logs are mounted to a relative path. These are also accessed by Filebeat and consumed by the Apache module
-      - logs-apache2:/var/log/apache2/
-    deploy:
-      mode: replicated
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-      labels:
-      - com.df.distribute=true
-      - com.df.notify=true
-      - com.df.port=80
-      - com.df.alertName=memlimit
-      - com.df.alertIf=@service_mem_limit:0.8
-      - com.df.alertFor=30s
-
-  #Mysql container
-  mysql:
-#    container_name: mqsql
-    hostname: mysql
-#    build: ${PWD}/config/mysql
-    image: uscdev/mysql
-    environment:
-      - "MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-changeme}"
-    networks:
-    - logging
-    #Expose port 3306 to allow users to connect and perform operations. These will be picked up by Packetbeat, Filebeat and Metricbeat
-    ports: ['3306:3306']
-    command: bash -c "chown -R mysql:mysql /var/log/mysql && exec /entrypoint.sh mysqld"
-    volumes:
-      #Use named volume so mysql data is persisted across restart
-      - mysqldata:/var/lib/mysql/
-      #Logs are mounted to a relative path. These are also accessed by Filebeat and consumed by the Mysql module
-      - logs-mysql:/var/log/mysql/
-    deploy:
-      mode: replicated
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-      labels:
-      - com.df.distribute=true
-      - com.df.notify=true
-      - com.df.port=80
-      - com.df.alertName=memlimit
-      - com.df.alertIf=@service_mem_limit:0.8
-      - com.df.alertFor=30s
-
   #Configure Stack container. This short lived container configures the stack once Kibana and Elasticsearch are available. More specifically, using a script it sets passwords, import dashboards, sets a default index pattern, loads templates and pipelines
   configure_stack:
 #    container_name: configure_stack
@@ -391,13 +317,7 @@ volumes:
     external: true
   mysqldata:
     external: true
-  logs-mysql:
-    driver: local
-  logs-nginx:
-    driver: local
-  logs-apache2:
-    driver: local
-  fbdata:
+  filebeat-data:
     driver: local
 
 configs:
@@ -421,42 +341,15 @@ configs:
     file: ./config/beats/packetbeat/packetbeat.yml
   metricbeat_config:
     file: ./config/beats/metricbeat/metricbeat.yml
-  metricbeat_apache_config:
-    file: ./config/beats/metricbeat/modules.d/apache.yml
   metricbeat_docker_config:
     file: ./config/beats/metricbeat/modules.d/docker.yml
-  metricbeat_mysql_config:
-    file: ./config/beats/metricbeat/modules.d/mysql.yml
-  metricbeat_nginx_config:
-    file: ./config/beats/metricbeat/modules.d/nginx.yml
   metricbeat_system_config:
     file: ./config/beats/metricbeat/modules.d/system.yml
 
 networks:
   default:
     driver: overlay
+  proxy:
+    external: true
   logging:
     external: true
-
-#volumes:
-#  #Es data
-#  esdata:
-#    driver: local
-#  #Filebeat data i.e. registry file
-#  fbdata:
-#    driver: local
-#networks: {stack: {}}
-#
-#
-#
-#configs:
-#  logstash_config:
-#    file: ./logstash/config/logstash.yml
-#  logstash_pipeline:
-#    file: ./logstash/pipeline/logstash.conf
-#
-#networks:
-#  default:
-#    driver: overlay
-#  proxy:
-#    external: true
