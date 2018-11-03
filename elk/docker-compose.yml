@@ -1,0 +1,167 @@
+version: '3.7'
+
+services:
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:${ELK_VERSION:-6.4.0}
+    environment:
+#    - xpack.security.enabled=false
+    - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+    - "9200:9200"
+    - "9300:9300"
+    configs:
+    - source: elastic_config
+      target: /usr/share/elasticsearch/config/elasticsearch.yml
+    networks:
+    - default
+    volumes:
+    - elasticsearch:/usr/share/elasticsearch/data
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      labels:
+      - com.df.distribute=true
+      - com.df.notify=true
+      - com.df.alertName=memlimit
+      - com.df.alertIf=@service_mem_limit:0.8
+      - com.df.alertFor=30s
+      resources:
+        reservations:
+          memory: 1000M
+        limits:
+          memory: 1500M
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash-oss:${ELK_VERSION:-6.4.0}
+    ports:
+    - "5000:5000"
+    - "9600:9600"
+    configs:
+    - source: logstash_config
+      target: /usr/share/logstash/config/logstash.yml
+    - source: logstash_pipeline
+      target: /usr/share/logstash/pipeline/logstash.conf
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+      LOGSPOUT: ignore
+    networks:
+    - default
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      labels:
+      - com.df.distribute=true
+      - com.df.notify=true
+      - com.df.port=80
+      - com.df.alertName=memlimit
+      - com.df.alertIf=@service_mem_limit:0.8
+      - com.df.alertFor=30s
+      resources:
+        reservations:
+          memory: 400M
+        limits:
+          memory: 600M
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:${ELK_VERSION:-6.4.0}
+    ports:
+      - "5601:5601"
+    environment:
+    - xpack.security.enabled=false
+    - ELASTICSEARCH_URL=http://elasticsearch:9200
+    configs:
+      - source: kibana_config
+        target: /usr/share/kibana/config/kibana.yml
+    networks:
+      - default
+      - proxy
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      labels:
+      - com.df.notify=true
+      - com.df.distribute=true
+      - com.df.serviceDomain.1=${ELK_SUB_DOMAIN:-elk}.${DOMAIN_NAME:-docker.usc.edu}
+      - com.df.port.1=5601
+      - com.df.xForwardedProto.1=true
+      - com.df.httpsOnly.1=true
+      - com.df.servicePath.2=${ELK_PATH:-/elk}
+      - com.df.port.2=5601
+      - com.df.reqPathSearchReplace.2=${ELK_PATH:-/elk},/
+      - com.df.xForwardedProto.2=true
+      - com.df.httpsOnly.2=true
+      - com.df.serviceDomain.3=${KIBANA_SUB_DOMAIN:-kibana}.${DOMAIN_NAME:-docker.usc.edu}
+      - com.df.port.3=5601
+      - com.df.xForwardedProto.3=true
+      - com.df.httpsOnly.3=true
+      - com.df.servicePath.4=${KIBANA_PATH:-/kibana}
+      - com.df.port.4=5601
+      - com.df.reqPathSearchReplace.4=${KIBANA_PATH:-/kibana},/
+      - com.df.xForwardedProto.4=true
+      - com.df.httpsOnly.4=true
+      - com.df.alertName=memlimit
+      - com.df.alertIf=@service_mem_limit:0.8
+      - com.df.alertFor=30s
+
+  logspout:
+    image: gliderlabs/logspout:${LOGSPOUT_VERSION:-v3.2.2}
+    networks:
+    - default
+#    - logging
+    environment:
+      ROUTE_URIS: syslog://logstash:51415
+#       ROUTE_URIS: logstash://logstash:5000
+      LOGSTASH_TAGS: docker-elk
+      SYSLOG_FORMAT: rfc3164
+    depends_on:
+    - logstash
+    volumes:
+    - /etc/hostname:/etc/host_hostname:ro
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    command:
+      syslog://logstash:51415
+#      logstash://logstash:5000
+    deploy:
+      mode: global
+      resources:
+        limits:
+          cpus: '0.20'
+          memory: 256M
+        reservations:
+          cpus: '0.10'
+          memory: 128M
+      restart_policy:
+        condition: on-failure
+      labels:
+      - com.df.notify=true
+      - com.df.distribute=true
+      - com.df.alertName=memlimit
+      - com.df.alertIf=@service_mem_limit:0.8
+      - com.df.alertFor=30s
+
+volumes:
+  elasticsearch:
+    external: true
+
+configs:
+  elastic_config:
+    file: ./elasticsearch/config/elasticsearch.yml
+  logstash_config:
+    file: ./logstash/config/logstash.yml
+  logstash_pipeline:
+    file: ./logstash/pipeline/logstash.conf
+  kibana_config:
+    file: ./kibana/config/kibana.yml
+
+networks:
+  default:
+    driver: overlay
+  proxy:
+    external: true
