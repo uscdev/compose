@@ -1,0 +1,69 @@
+version: '3.7'
+services:
+
+  alpine1:
+    image: alpine
+    hostname: apline1
+    command: >
+      sh -c "chown 1000 /usr/share/elasticsearch/data &&
+             chgrp 1000 /usr/share/elasticsearch/data &&
+             chown 1000 /usr/share/elasticsearch/data/lost\+found &&
+             chgrp 1000 /usr/share/elasticsearch/data/lost\+found &&
+             echo File Permissions changed"
+    volumes:
+    - elasticsearch-data:/usr/share/elasticsearch/data
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: none
+      placement:
+        constraints:
+        - node.hostname==ip-172-31-2-178.us-east-2.compute.internal
+
+volumes:
+  elasticsearch-data:
+    external: true
+
+#  alpine2:
+#    image: alpine
+#    hostname: alpine2
+#    command: sleep 36000
+#    networks:
+#    - alpine1
+#    - alpine3
+#    deploy:
+#      replicas: 1
+#      update_config:
+#        parallelism: 1
+#        delay: 10s
+#      restart_policy:
+#        condition: on-failure
+#
+#  alpine3:
+#    image: alpine
+#    hostname: alpine
+#    command: sleep 36000
+#    networks:
+#    - alpine2
+#    - alpine3
+#    deploy:
+#      replicas: 1
+#      update_config:
+#        parallelism: 1
+#        delay: 10s
+#      restart_policy:
+#        condition: on-failure
+
+#volumes:
+#  alpine:
+#    external: true
+#networks:
+#  alpine1:
+#    driver: overlay
+#  alpine2:
+#    driver: overlay
+#  alpine3:
+#    driver: overlay
