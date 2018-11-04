@@ -36,7 +36,8 @@ services:
     - source: elastic_config
       target: /usr/share/elasticsearch/elasticsearch.yml
     volumes:
-    - elasticsearch:/usr/share/elasticsearch/data
+    - elasticsearch-data:/usr/share/elasticsearch/data
+
     #Port 9200 is available on the host. Need to for user to access as well as Packetbeat
     ports: ['9200:9200']
     #Healthcheck to confirm availability of ES. Other containers wait on this.
@@ -313,9 +314,7 @@ services:
         condition: none
 
 volumes:
-  elasticsearch:
-    external: true
-  mysqldata:
+  elasticsearch-data:
     external: true
   filebeat-data:
     driver: local
