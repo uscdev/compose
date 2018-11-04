@@ -16,7 +16,7 @@ services:
     networks:
     - default
     volumes:
-    - elasticsearch:/usr/share/elasticsearch/data
+    - elasticsearch-data:/usr/share/elasticsearch/data
     deploy:
       mode: replicated
       replicas: 1
@@ -147,7 +147,7 @@ services:
       - com.df.alertFor=30s
 
 volumes:
-  elasticsearch:
+  elasticsearch-data:
     external: true
 
 configs:
