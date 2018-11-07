@@ -171,8 +171,7 @@ services:
       target: /usr/share/filebeat/prospectors.d/docker.yml
     volumes:
       #Mount the hosts system log directory. This represents the logs of the VM hosting docker. Consumed by the filebeat system module.
-      - /var/log/:/var/log/host/
-      #:ro
+      - /var/log/:/var/log/host/:ro
       #Mount the docker logs for indexing by the custom prospector ./config/filebeat/prospectors.d
       - /var/lib/docker/containers:/hostfs/var/lib/docker/containers
       #Named volume fsdata. This is used to persist the registry file between restarts, so to avoid data duplication
@@ -217,15 +216,12 @@ services:
       target: /usr/share/metricbeat/modules.d/system.yml
     volumes:
       # The commented sections below enable Metricbeat to monitor the Docker host rather than the Metricbeat container. These are used by the system module.
-      - /proc:/hostfs/proc
-      #:ro
-      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup
-      #:ro
+      - /proc:/hostfs/proc:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
       #Allows us to report on docker from the hosts information
       - /var/run/docker.sock:/var/run/docker.sock
       #We mount the host filesystem so we can report on disk usage with the system module
-      - /:/hostfs
-      #:ro
+      - /:/hostfs:ro
     command: metricbeat -e -system.hostfs=/hostfs -E output.elasticsearch.username=elastic -E output.elasticsearch.password=${ES_PASSWORD:-changeme} -strict.perms=false
     networks:
     - logging
