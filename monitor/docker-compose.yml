@@ -70,13 +70,14 @@ services:
     - '--config.file=/run/secrets/alert_manager_config'
     - '--storage.path=/alertmanager'
     volumes:
-    - alertmanager:/alertmanager
+    - alertmanager-data:/alertmanager
     environment:
     - SLACK_URL=${SLACK_URL:-https://hooks.slack.com/services/TOKEN}
     - SLACK_CHANNEL=${SLACK_CHANNEL:-general}
     - SLACK_USER=${SLACK_USER:-alertmanager}
     networks:
     - monitor
+    - proxy
     secrets:
     - alert_manager_config
     ports:
@@ -112,6 +113,7 @@ services:
     image: cloudflare/unsee:${UNSEE_TAG:-v0.8.0}
     networks:
     - monitor
+    - proxy
     environment:
     - "ALERTMANAGER_URIS=default:http://alert-manager:9093"
     ports:
@@ -139,6 +141,7 @@ services:
     image: grafana/grafana:${GRAFANA_TAG:-5.0.1}
     networks:
     - monitor
+    - proxy
     configs:
     - source: grafana_datasources_prometheus
       target: /etc/grafana/provisioning/datasources/prometheus.yaml
@@ -169,7 +172,7 @@ services:
       #- GF_SMTP_USER=${GF_SMTP_USER}
       #- GF_SMTP_PASSWORD=${GF_SMTP_PASSWORD}
     volumes:
-    - grafana:/var/lib/grafana
+    - grafana-data:/var/lib/grafana
     ports:
     - 3000:3000
     deploy:
@@ -293,9 +296,9 @@ networks:
 volumes:
 #  prometheus:
 #    external: true
-  grafana:
+  grafana-data:
     external: true
-  alertmanager:
+  alertmanager-data:
     external: true
 
 configs:

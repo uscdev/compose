@@ -13,7 +13,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/volumes:/var/lib/docker/volumes
     networks:
-      - agent_network
+      - default
     deploy:
       mode: global
       placement:
@@ -27,7 +27,8 @@ services:
     volumes:
       - portainer-data:/data
     networks:
-      - agent_network
+      - default
+      - proxy
     deploy:
       mode: replicated
       replicas: 1
@@ -41,9 +42,11 @@ services:
       - com.df.serviceDomain=portainer.${DOMAIN_NAME:-docker.usc.edu}
 
 networks:
-  agent_network:
+  default:
     driver: overlay
     attachable: true
+  proxy:
+    external: true
 
 volumes:
   portainer-data:

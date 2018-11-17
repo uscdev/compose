@@ -2,6 +2,12 @@
 
 export SECRET_PATH=/run/secrets
 export PEM_PATH=$SECRET_PATH/certificates/usc
+export SELF_PATH=$SECRET_PATH/certificates/self
+
+docker secret create apache.crt $SELF_PATH/apache.crt
+docker secret create apache.key $SELF_PATH/apache.key
+docker secret create sp-cert.pem $SELF_PATH/sp-cert.pem
+docker secret create sp-key.pem $SELF_PATH/sp-key.pem
 
 export SITE=swarm
 export DOMAIN_NAME=$SITE.usc.edu
@@ -45,6 +51,9 @@ docker secret create its-bsa-dev-us-west-2-key-pair.pem $SECRET_PATH/keys/aws/ss
 
 docker network create --driver overlay proxy
 docker network create --driver overlay monitor
+docker network create --driver overlay logging
+docker network create --driver overlay test
+docker network create --driver overlay selenium
 
 docker volume create -d "cloudstor:aws" \
   --opt size=10 \
@@ -68,9 +77,28 @@ docker volume create -d "cloudstor:aws" \
 docker volume create -d "cloudstor:aws" \
   --opt size=30 \
   --opt backing=relocatable \
-  grafana
+  grafana-data
 
 docker volume create -d "cloudstor:aws" \
   --opt size=30 \
   --opt backing=relocatable \
-  alert-manager
+  alert-manager-data
+
+# docker volume create -d "cloudstor:aws" --opt backing=shared nexus-data
+docker volume create -d "cloudstor:aws" \
+  --opt size=30 \
+  --opt backing=relocatable \
+  --opt uid=1000,gid=1000 \
+  elasticsearch-data
+
+# docker volume create -d "cloudstor:aws" --opt backing=shared nexus-data
+docker volume create -d "cloudstor:aws" \
+  --opt size=30 \
+  --opt backing=relocatable \
+  filebeat-data
+
+# devops example
+docker volume create -d "cloudstor:aws" \
+  --opt size=30 \
+  --opt backing=relocatable \
+  mongo-db
