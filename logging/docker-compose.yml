@@ -23,7 +23,7 @@ services:
 
   elasticsearch:
     hostname: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION:-6.4.2}
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION:-6.5.0}
     environment:
     #    - xpack.security.enabled=false
     - http.host=0.0.0.0
@@ -53,7 +53,7 @@ services:
       - com.df.notify=true
       - com.df.port=80
       - com.df.httpsOnly=true
-      - com.df.serviceDomain=elasticsearch.docker.usc.edu
+      - com.df.serviceDomain=elasticsearch.${DOMAIN_NAME:-docker.usc.edu}
       - com.df.alertName=memlimit
       - com.df.alertIf=@service_mem_limit:0.8
       - com.df.alertFor=30s
@@ -67,7 +67,7 @@ services:
       test: ["CMD", "curl","-s" ,"-f", "-u", "elastic:${ES_PASSWORD:-changeme}", "http://localhost:9200/_cat/health"]
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:${ELK_VERSION:-6.4.2}
+    image: docker.elastic.co/logstash/logstash:${ELK_VERSION:-6.5.0}
     ports:
     - "5000:5000"
     - "9600:9600"
@@ -100,7 +100,7 @@ services:
           memory: 600M
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:${ELK_VERSION:-6.4.2}
+    image: docker.elastic.co/kibana/kibana:${ELK_VERSION:-6.5.0}
     ports:
     - "5601:5601"
     environment:
@@ -193,7 +193,7 @@ services:
 #  #Configure Stack container. This short lived container configures the stack once Kibana and Elasticsearch are available. More specifically, using a script it sets passwords, import dashboards, sets a default index pattern, loads templates and pipelines
 #  configure_stack:
 #    #    container_name: configure_stack
-#    image: docker.elastic.co/beats/metricbeat:${ELASTIC_VERSION:-6.4.2}
+#    image: docker.elastic.co/beats/metricbeat:${ELASTIC_VERSION:-6.5.0}
 #    configs:
 #    - source: configure-stack
 #      target: /usr/local/bin/configure-stack.sh
@@ -206,7 +206,7 @@ services:
 #    command: ['/bin/bash', '-c', 'cat /usr/local/bin/configure-stack.sh | tr -d "\r" | bash']
 #    networks:
 #    - logging
-#    environment: ['ELASTIC_VERSION=${ELASTIC_VERSION:-6.4.2}','ES_PASSWORD=${ES_PASSWORD:-changeme}','DEFAULT_INDEX_PATTERN=${DEFAULT_INDEX_PATTERN:-metricbeat-*}']
+#    environment: ['ELASTIC_VERSION=${ELASTIC_VERSION:-6.5.0}','ES_PASSWORD=${ES_PASSWORD:-changeme}','DEFAULT_INDEX_PATTERN=${DEFAULT_INDEX_PATTERN:-metricbeat-*}']
 #    depends_on:
 #    - elasticsearch
 #    - kibana

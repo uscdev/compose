@@ -90,6 +90,7 @@ docker volume create -d "cloudstor:aws" \
   --opt backing=relocatable \
   --opt uid=1000,gid=1000 \
   elasticsearch-data
+docker stack deploy --compose-file ./shared/docker-compose-volume-fix-elk.yml elk-fix-volume
 
 # docker volume create -d "cloudstor:aws" --opt backing=shared nexus-data
 docker volume create -d "cloudstor:aws" \
