@@ -5,7 +5,7 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - ${USC_LOCAL_DIR}/mysql:/var/lib/mysql
+      - ${USC_BLOCK_DIR:-/docker-nfs}/mysql:/var/lib/mysql
     deploy:
       replicas: 1
       update_config:

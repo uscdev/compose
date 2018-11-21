@@ -33,6 +33,8 @@ fi
 export USC_SHARED_DIR_NFS=/mnt/docker/nfs
 export USC_SHARED_DIR=/mnt/docker/gluster
 export USC_LOCAL_DIR=/mnt/docker/disk2
+export USC_BLOCK_DIR=/mnt/docker/disk2
+export USC_BACKUP_DIR=${USC_SHARED_DIR_NFS}
 
 export USC_MOBILE_DATA_DIR=${USC_SHARED_DIR_NFS}/mobile/data
 export USC_MOBILE_DB_DIR=${USC_SHARED_DIR_NFS}/mobile/db
@@ -48,21 +50,29 @@ export NODE03=${HOSTNAME}
 
 mkdir -p ${USC_SHARED_DIR_NFS}/wordpress/db
 mkdir -p ${USC_SHARED_DIR_NFS}/wordpress/data
-mkdir -p ${USC_LOCAL_DIR}/jenkins
-mkdir -p ${USC_LOCAL_DIR}/nexus
+mkdir -p ${USC_BLOCK_DIR}/jenkins
+mkdir -p ${USC_BLOCK_DIR}/nexus
 chmod a+rw ${USC_SHARED_DIR_NFS}/wordpress/db
 chmod a+rw ${USC_SHARED_DIR_NFS}/wordpress/data
-chmod a+rw ${USC_LOCAL_DIR}/jenkins
-chmod a+rw ${USC_LOCAL_DIR}/nexus
+chmod a+rw ${USC_BLOCK_DIR}/jenkins
+chmod a+rw ${USC_BLOCK_DIR}/nexus
 
 unset DOCKER_HOST
 unset DOCKER_TLS_VERIFY
 unset DOCKER_CERT_PATH
+
+unset GRAFANA_DATA
+unset ALERTMANAGER_DATA
+
 if [ "$1" = "dcorley-swarm.usc.edu" ]; then
     export NODE00=dcorley-swarm-mgr01.usc.edu
     export NODE01=dcorley-swarm-node01.usc.edu
     export NODE02=dcorley-swarm-node02.usc.edu
     export NODE03=dcorley-swarm-node03.usc.edu
+
+    export GRAFANA_DATA=grafana-data
+    export ALERTMANAGER_DATA=alertmanager-data
+    export NEXUS_DATA=nexus-data
 fi;
 if [ "$1" = "swarm-test.usc.edu" ]; then
     export NODE00=swarm-test1.usc.edu

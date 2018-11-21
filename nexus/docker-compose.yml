@@ -7,7 +7,7 @@ services:
     networks:
     - proxy
     volumes:
-    - ${USC_LOCAL_DIR}/nexus:/nexus-data
+    - ${USC_BLOCK_DIR:-/docker-nfs}/nexus:/nexus-data
 #    secrets:
 #      - keystore.jks
     deploy:
@@ -39,9 +39,10 @@ services:
 networks:
   proxy:
     external: true
-volumes:
-  nexus-data:
-    external: true
+#volumes:
+#  nexus-data:
+#    external:
+#      name: ${NEXUS_DATA:-nexus-data}
 # secrets:
 #  keystore.jks:
 #    external: true
