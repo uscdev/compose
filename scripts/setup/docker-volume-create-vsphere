@@ -1,0 +1,9 @@
+docker volume create --driver=vsphere --name=wd-mongo-data -o size=10gb
+docker volume create --driver=vsphere --name=jenkins-data -o size=10gb
+docker volume create --driver=vsphere --name=nexus-data -o size=10gb
+docker volume create --driver=vsphere --name=grafana-data -o size=10gb
+docker volume create --driver=vsphere --name=alert-manager-data -o size=10gb
+docker volume create --driver=vsphere --name=elasticsearch-data -o size=10gb
+docker volume create --driver=vsphere --name=filebeat-data -o size=10gb
+docker volume create --driver=vsphere --name=mongo-db -o size=10gb
+docker volume create --driver=vsphere --name=portainer-data -o size=10gb

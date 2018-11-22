@@ -4,13 +4,15 @@ services:
   db:
     image: uscdev/guacamole-mysql-initdb:5.7
     hostname: db
+#    command: sleep 36000
     volumes:
     - db:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: example
+      MYSQL_ROOT_PASSWORD: ${GUACAMOLE_MYSQL_ROOT_PASSWORD:-example}
       MYSQL_DATABASE: guacamole_db
       MYSQL_USER: guacamole_user
-      MYSQL_PASSWORD: password
+      MYSQL_PASSWORD: ${GUACAMOLE_MYSQL_PASSWORD:-password}
+    user: mysql
     deploy:
       replicas: 1
       update_config:
@@ -18,6 +20,9 @@ services:
         delay: 10s
       restart_policy:
         condition: none
+#      placement:
+#        constraints:
+#        - node.hostname==ip-172-31-39-26.us-east-2.compute.internal
 
 volumes:
   db:

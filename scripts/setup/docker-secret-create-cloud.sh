@@ -35,8 +35,3 @@ docker secret create dfp_users_backend $SECRET_PATH/passwords/usc/workday/secret
 export SITE=device-registration
 export DOMAIN_NAME=$SITE.usc.edu
 docker secret create cert-$DOMAIN_NAME.pem $PEM_PATH/$DOMAIN_NAME/haproxy/cert-$DOMAIN_NAME.pem
-
-docker network create --driver overlay proxy
-docker network create --driver overlay monitor
-
-docker volume create -d "cloudstor:aws" --opt size=10 --opt backing=relocatable wd-mongo-data

@@ -297,11 +297,11 @@ volumes:
 #  prometheus:
 #    external: true
   grafana-data:
-    external:
-      name: ${GRAFANA_DATA:-grafana-data}
+    external: true
+    name: ${GRAFANA_DATA:-grafana-data}
   alertmanager-data:
-    external:
-      name: ${ALERTMANAGER_DATA:-alertmanager-data}
+    external: true
+    name: ${ALERTMANAGER_DATA:-alertmanager-data}
 
 configs:
   grafana_datasources_prometheus:
