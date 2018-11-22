@@ -22,7 +22,7 @@ services:
         condition: none
 #      placement:
 #        constraints:
-#        - node.hostname==ip-172-31-39-26.us-east-2.compute.internal
+#        - node.hostname==ip-172-31-32-83.us-east-2.compute.internal
 
 volumes:
   db:

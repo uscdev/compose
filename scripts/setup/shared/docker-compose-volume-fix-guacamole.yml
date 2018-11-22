@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+
+  fix-file-permissions:
+    image: alpine
+    hostname: fix-file-permissions-gracamole
+    command: >
+      sh -c "chown -R 999 var/lib/mysql &&
+             chgrp -R 999 var/lib/mysql &&
+             chown 999 var/lib/mysql/lost\+found &&
+             chgrp 999 var/lib/mysql/lost\+found &&
+             echo File Permissions changed"
+    volumes:
+    - db:/var/lib/mysql
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: none
+
+volumes:
+  db:
+    external: true
+    name: guacamole-db
