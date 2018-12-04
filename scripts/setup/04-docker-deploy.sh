@@ -23,7 +23,7 @@ docker stack deploy --compose-file $COMPOSE_PATH/monitor/docker-compose.yml moni
 docker stack deploy --compose-file $COMPOSE_PATH/logging/docker-compose.yml logging
 
 docker stack deploy --compose-file $COMPOSE_PATH/selenium/docker-compose.yml selenium
-docker stack deploy --compose-file $COMPOSE_PATH/guacamole/guacamole-mysql-initdb/docker-compose.yml guacamole-setup
+# docker stack deploy --compose-file $COMPOSE_PATH/guacamole/guacamole-mysql-initdb/docker-compose.yml guacamole-setup
 # shutdown setup program (or change to use remote db)
 docker stack deploy --compose-file $COMPOSE_PATH/guacamole/docker-compose.yml guacamole
 
