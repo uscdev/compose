@@ -6,7 +6,7 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - ${USC_LOCAL_DIR}/wd-mongodb/data/db:/data/db
+      - ${USC_BLOCK_DIR:-/docker-nfs}/wd-mongodb/data/db:/data/db
     deploy:
       replicas: 1
       update_config:

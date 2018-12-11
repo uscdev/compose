@@ -1,0 +1,122 @@
+version: '3.7'
+
+services:
+
+  # Load index
+  elasticsearch-dump:
+    #    container_name: configure_stack
+    image: taskrabbit/elasticsearch-dump:${ELASTIC_DUMP_VERSION:-latest}
+    #    volumes: ['./init/configure-stack.sh:/usr/local/bin/configure-stack.sh:ro','./init/pipelines/:/usr/local/bin/pipelines/','./init/templates/:/usr/local/bin/templates/']
+#    command: ['/bin/bash', '-c', 'cat /usr/local/bin/configure-stack.sh | tr -d "\r" | bash']
+    command: ['--input=http://elastic:${ES_PASSWORD}@elasticsearch:9200/.kibana', '--output=/tmp/test/my_index_mapping.json', '--type=mapping']
+    networks:
+    - logging
+    environment: ['ELASTIC_VERSION=${ELASTIC_VERSION:-6.5.0}','ES_PASSWORD=${ES_PASSWORD:-changeme}','DEFAULT_INDEX_PATTERN=${DEFAULT_INDEX_PATTERN:-metricbeat-*}']
+    volumes:
+    - temp:/tmp/test
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: none
+
+
+  #Configure Stack container. This short lived container configures the stack once Kibana and Elasticsearch are available. More specifically, using a script it sets passwords, import dashboards, sets a default index pattern, loads templates and pipelines
+  configure_stack:
+    #    container_name: configure_stack
+    image: docker.elastic.co/beats/metricbeat:5.5.1
+    configs:
+    - source: configure-stack
+      target: /usr/local/bin/configure-stack.sh
+    #      read-only
+    - source: pipelines
+      target: /usr/local/bin/pipelines/docker-logs.json
+    - source: templates
+      target: /usr/local/bin/templates/docker-logs.json
+    #    volumes: ['./init/configure-stack.sh:/usr/local/bin/configure-stack.sh:ro','./init/pipelines/:/usr/local/bin/pipelines/','./init/templates/:/usr/local/bin/templates/']
+#    command: ['/bin/bash', '-c', 'cat /usr/local/bin/configure-stack.sh | tr -d "\r" | bash']
+    command: ['sleep', '36000']
+    networks:
+    - logging
+    environment: ['ELASTIC_VERSION=${ELASTIC_VERSION:-5.5.1}','ES_PASSWORD=${ES_PASSWORD:-changeme}','DEFAULT_INDEX_PATTERN=${DEFAULT_INDEX_PATTERN:-metricbeat-*}']
+    depends_on:
+    - elasticsearch
+    - kibana
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: none
+
+
+  #  docker run --rm -ti taskrabbit/elasticsearch-dump \
+#  --input=http://production.es.com:9200/my_index \
+#  --output=http://staging.es.com:9200/my_index \
+#  --type=mapping
+#  docker run --rm -ti taskrabbit/elasticsearch-dump \
+#  --input=http://production.es.com:9200/my_index \
+#  --output=http://staging.es.com:9200/my_index \
+#  --type=data
+#
+#  # Backup index data to a file:
+#  docker run --rm -ti -v /data:/tmp taskrabbit/elasticsearch-dump \
+#  --input=http://production.es.com:9200/my_index \
+#  --output=/tmp/my_index_mapping.json \
+#  --type=mapping
+
+
+  ubuntu3:
+    image: ubuntu
+    hostname: ubuntu3
+    command: sleep 36000
+    volumes:
+    - temp:/tmp/test
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  temp:
+    external: true
+
+configs:
+  elastic_config:
+    file: ./config/elasticsearch/config/elasticsearch.yml
+  logstash_config:
+    file: ./config/logstash/config/logstash.yml
+  logstash_pipeline:
+    file: ./config/logstash/pipeline/logstash.conf
+  kibana_config:
+    file: ./config/kibana/config/kibana.yml
+  configure-stack:
+    file: ./config/init/configure-stack.sh
+  pipelines:
+    file: ./config/init/pipelines/docker-logs.json
+  templates:
+    file: ./config/init/templates/docker-logs.json
+  heartbeat_config:
+    file: ./config/beats/heartbeat/heartbeat.yml
+  filebeat_config:
+    file: ./config/beats/filebeat/filebeat.yml
+  prospectors_config:
+    file: ./config/beats/filebeat/prospectors.d/docker.yml
+  packetbeat_config:
+    file: ./config/beats/packetbeat/packetbeat.yml
+  metricbeat_config:
+    file: ./config/beats/metricbeat/metricbeat.yml
+  metricbeat_docker_config:
+    file: ./config/beats/metricbeat/modules.d/docker.yml
+  metricbeat_system_config:
+    file: ./config/beats/metricbeat/modules.d/system.yml
+
+networks:
+  logging:
+    external: true

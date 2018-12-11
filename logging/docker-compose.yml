@@ -2,28 +2,28 @@ version: '3.7'
 
 services:
 
-  fix-file-permissions:
-    image: alpine
-    hostname: fix-file-permissions
-    command: >
-      sh -c "chown 1000 /usr/share/elasticsearch/data &&
-             chgrp 1000 /usr/share/elasticsearch/data &&
-             chown 1000 /usr/share/elasticsearch/data/lost\+found &&
-             chgrp 1000 /usr/share/elasticsearch/data/lost\+found &&
-             echo File Permissions changed"
-    volumes:
-    - elasticsearch-data:/usr/share/elasticsearch/data
-    deploy:
-      replicas: 1
-      update_config:
-        parallelism: 1
-        delay: 10s
-      restart_policy:
-        condition: none
+#  fix-file-permissions:
+#    image: alpine
+#    hostname: fix-file-permissions
+#    command: >
+#      sh -c "chown 1000 /usr/share/elasticsearch/data &&
+#             chgrp 1000 /usr/share/elasticsearch/data &&
+#             chown 1000 /usr/share/elasticsearch/data/lost\+found &&
+#             chgrp 1000 /usr/share/elasticsearch/data/lost\+found &&
+#             echo File Permissions changed"
+#    volumes:
+#    - elasticsearch-data:/usr/share/elasticsearch/data
+#    deploy:
+#      replicas: 1
+#      update_config:
+#        parallelism: 1
+#        delay: 10s
+#      restart_policy:
+#        condition: none
 
   elasticsearch:
     hostname: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION:-6.4.2}
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION:-6.5.0}
     environment:
     #    - xpack.security.enabled=false
     - http.host=0.0.0.0
@@ -53,7 +53,7 @@ services:
       - com.df.notify=true
       - com.df.port=80
       - com.df.httpsOnly=true
-      - com.df.serviceDomain=elasticsearch.docker.usc.edu
+      - com.df.serviceDomain=elasticsearch.${DOMAIN_NAME:-docker.usc.edu}
       - com.df.alertName=memlimit
       - com.df.alertIf=@service_mem_limit:0.8
       - com.df.alertFor=30s
@@ -67,7 +67,7 @@ services:
       test: ["CMD", "curl","-s" ,"-f", "-u", "elastic:${ES_PASSWORD:-changeme}", "http://localhost:9200/_cat/health"]
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:${ELK_VERSION:-6.4.2}
+    image: docker.elastic.co/logstash/logstash:${ELK_VERSION:-6.5.0}
     ports:
     - "5000:5000"
     - "9600:9600"
@@ -100,7 +100,7 @@ services:
           memory: 600M
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:${ELK_VERSION:-6.4.2}
+    image: docker.elastic.co/kibana/kibana:${ELK_VERSION:-6.5.0}
     ports:
     - "5601:5601"
     environment:
@@ -190,10 +190,215 @@ services:
       - com.df.alertIf=@service_mem_limit:0.8
       - com.df.alertFor=30s
 
-#  #Configure Stack container. This short lived container configures the stack once Kibana and Elasticsearch are available. More specifically, using a script it sets passwords, import dashboards, sets a default index pattern, loads templates and pipelines
-#  configure_stack:
+  #Heartbeat container
+  heartbeat:
+    #    container_name: heartbeat
+    hostname: heartbeat
+    image: "docker.elastic.co/beats/heartbeat:${ELASTIC_VERSION:-6.5.0}"
+      #    volumes:
+    #Mount the heartbeat configuration so users can make edits
+    configs:
+    - source: heartbeat_config
+      target: /usr/share/heartbeat/heartbeat.yml
+    depends_on:
+    - elasticsearch
+    #      :  { condition: service_healthy }
+    environment:
+    - "ES_PASSWORD=${ES_PASSWORD:-changeme}"
+    command: heartbeat -e -E output.elasticsearch.username=elastic -E output.elasticsearch.password=${ES_PASSWORD:-changeme} -strict.perms=false
+    networks:
+    - logging
+    #    restart: on-failure
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      labels:
+      - com.df.distribute=true
+      - com.df.notify=true
+      - com.df.port=80
+      - com.df.alertName=memlimit
+      - com.df.alertIf=@service_mem_limit:0.8
+      - com.df.alertFor=30s
+
+# Note: There is something wrong with this container - It maxes out the net connection???
+#  #Filebeat container
+#  filebeat:
+#    #    container_name: filebeat
+#    hostname: filebeat
+#    user: root
+#    image: "docker.elastic.co/beats/filebeat:${ELASTIC_VERSION:-6.5.0}"
+#    configs:
+#    #Mount the filebeat configuration so users can make edit
+#    - source: filebeat_config
+#      target: /usr/share/filebeat/filebeat.yml
+#    #Mount the prospectors directory. Users can in turn add propspectors to this directory and they will be dynamically loaded
+#    - source: prospectors_config
+#      target: /usr/share/filebeat/prospectors.d/docker.yml
+#    volumes:
+#    #Mount the hosts system log directory. This represents the logs of the VM hosting docker. Consumed by the filebeat system module.
+#    - /var/log/:/var/log/host/
+#    #:ro
+#    #Mount the docker logs for indexing by the custom prospector ./config/filebeat/prospectors.d
+#    - /var/lib/docker/containers:/hostfs/var/lib/docker/containers
+#    #Named volume fsdata. This is used to persist the registry file between restarts, so to avoid data duplication
+#    - filebeat-data:/usr/share/filebeat/data/
+#    networks:
+#    - logging
+#    command: filebeat -e -E output.elasticsearch.username=elastic -E output.elasticsearch.password=${ES_PASSWORD:-changeme} -strict.perms=false
+#    #    restart: on-failure
+#    depends_on:
+#    #wait for the these services to come up. This ensures the logs are available and ES exists for indexing
+#    - elasticsearch
+#    #      :  { condition: service_healthy }
+#    # - nginx
+#    #      : { condition: service_started }
+#    # - apache2
+#    #      : { condition: service_started }
+#    deploy:
+#      mode: global
+#      restart_policy:
+#        condition: on-failure
+#      labels:
+#      - com.df.notify=true
+#      - com.df.distribute=true
+#      - com.df.alertName=memlimit
+#      - com.df.alertIf=@service_mem_limit:0.8
+#      - com.df.alertFor=30s
+
+  #Metricbeat container
+  metricbeat:
+    #    container_name: metricbeat
+    hostname: metricbeat
+    user: root
+    image: docker.elastic.co/beats/metricbeat:${ELASTIC_VERSION:-6.5.0}
+    configs:
+    #Mount the metricbeat configuration so users can make edit
+    - source: metricbeat_config
+      target: /usr/share/metricbeat/metricbeat.yml
+      #Mount the modules.d directory into the container. This allows user to potentially make changes to the modules and they will be dynamically loaded.
+    - source: metricbeat_docker_config
+      target: /usr/share/metricbeat/modules.d/docker.yml
+    - source: metricbeat_system_config
+      target: /usr/share/metricbeat/modules.d/system.yml
+    volumes:
+    # The commented sections below enable Metricbeat to monitor the Docker host rather than the Metricbeat container. These are used by the system module.
+    - /proc:/hostfs/proc
+    #:ro
+    - /sys/fs/cgroup:/hostfs/sys/fs/cgroup
+    #:ro
+    #Allows us to report on docker from the hosts information
+    - /var/run/docker.sock:/var/run/docker.sock
+    #We mount the host filesystem so we can report on disk usage with the system module
+    - /:/hostfs
+    #:ro
+    command: metricbeat -e -system.hostfs=/hostfs -E output.elasticsearch.username=elastic -E output.elasticsearch.password=${ES_PASSWORD:-changeme} -strict.perms=false
+    networks:
+    - logging
+    #    restart: on-failure
+    environment:
+    - "MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-changeme}"
+    depends_on:
+    #wait for the these services to come up. This ensures the logs are available and ES exists for indexing
+    - elasticsearch
+    #        :  { condition: service_healthy }
+    # - nginx
+    #        : { condition: service_started }
+    # - apache2
+    #        : { condition: service_started }
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+      labels:
+      - com.df.notify=true
+      - com.df.distribute=true
+      - com.df.alertName=memlimit
+      - com.df.alertIf=@service_mem_limit:0.8
+      - com.df.alertFor=30s
+
+#  #Packetbeat container
+#  packetbeat:
+#    #    container_name: packetbeat
+#    hostname: packetbeat
+#    image: "docker.elastic.co/beats/packetbeat:${ELASTIC_VERSION:-6.5.0}"
+#    configs:
+#    #Mount the filebeat configuration so users can make edit
+#    - source: packetbeat_config
+#      target: /usr/share/packetbeat/packetbeat.yml
+#    # Packetbeat needs some elevated privileges to capture network traffic.
+#    # We'll grant them with POSIX capabilities.
+#    #    cap_add: ['NET_RAW', 'NET_ADMIN']
+#    # Use "host mode" networking to allow Packetbeat to capture traffic from
+#    # the real network interface on the host, rather than being isolated to the
+#    # container's virtual interface.
+#    #    network_mode: host
+#    command: packetbeat -e -E output.elasticsearch.hosts='["localhost:9200"]' -E output.elasticsearch.username=elastic -E output.elasticsearch.password=${ES_PASSWORD:-changeme} -strict.perms=false
+#    depends_on:
+#    #Wait for ES to be up before we start collecting
+#    - elasticsearch
+#    #        :  { condition: service_healthy }
+#    deploy:
+#      mode: replicated
+#      replicas: 1
+#      restart_policy:
+#        condition: on-failure
+#      labels:
+#      - com.df.distribute=true
+#      - com.df.notify=true
+#      - com.df.port=80
+#      - com.df.alertName=memlimit
+#      - com.df.alertIf=@service_mem_limit:0.8
+#      - com.df.alertFor=30s
+
+  #Configure Stack container. This short lived container configures the stack once Kibana and Elasticsearch are available. More specifically, using a script it sets passwords, import dashboards, sets a default index pattern, loads templates and pipelines
+  configure_stack:
+    #    container_name: configure_stack
+    image: docker.elastic.co/beats/metricbeat:${ELASTIC_VERSION:-6.5.0}
+    configs:
+    - source: configure-stack
+      target: /usr/local/bin/configure-stack.sh
+    #      read-only
+    - source: pipelines
+      target: /usr/local/bin/pipelines/docker-logs.json
+    - source: templates
+      target: /usr/local/bin/templates/docker-logs.json
+    #    volumes: ['./init/configure-stack.sh:/usr/local/bin/configure-stack.sh:ro','./init/pipelines/:/usr/local/bin/pipelines/','./init/templates/:/usr/local/bin/templates/']
+#    command: ['/bin/bash', '-c', 'cat /usr/local/bin/configure-stack.sh | tr -d "\r" | bash']
+#    command: docker run --net="host" docker.elastic.co/beats/metricbeat:6.5.0 setup --dashboards
+#    command: ['sleep', '36000']
+#    command: ['setup --dashboards -e -E setup.kibana.host="http://kibana:5601"']
+    command: >
+      bash -c "echo Starting dashboard setup process &&
+              until curl -s http://kibana:5601/login -o /dev/null; do
+              echo Waiting for Kibana...
+              sleep 1
+              done &&
+              echo Setting up dashboards... please wait &&
+              metricbeat setup --dashboards -e -E setup.kibana.host="http://kibana:5601" &&
+              echo Dashboards added"
+    networks:
+    - logging
+    environment: ['ELASTIC_VERSION=${ELASTIC_VERSION:-6.5.0}','ES_PASSWORD=${ES_PASSWORD:-changeme}','DEFAULT_INDEX_PATTERN=${DEFAULT_INDEX_PATTERN:-metricbeat-*}']
+    depends_on:
+    - elasticsearch
+    - kibana
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: none
+#      placement:
+#        constraints:
+#        - node.hostname == ip-172-31-31-196.us-east-2.compute.internal
+
+#  # Load index
+#  elasticsearch-dump:
 #    #    container_name: configure_stack
-#    image: docker.elastic.co/beats/metricbeat:${ELASTIC_VERSION:-6.4.2}
+#    image: taskrabbit/elasticsearch-dump:${ELASTIC_DUMP_VERSION:-latest}
 #    configs:
 #    - source: configure-stack
 #      target: /usr/local/bin/configure-stack.sh
@@ -203,10 +408,11 @@ services:
 #    - source: templates
 #      target: /usr/local/bin/templates/docker-logs.json
 #    #    volumes: ['./init/configure-stack.sh:/usr/local/bin/configure-stack.sh:ro','./init/pipelines/:/usr/local/bin/pipelines/','./init/templates/:/usr/local/bin/templates/']
-#    command: ['/bin/bash', '-c', 'cat /usr/local/bin/configure-stack.sh | tr -d "\r" | bash']
+##    command: ['/bin/bash', '-c', 'cat /usr/local/bin/configure-stack.sh | tr -d "\r" | bash']
+#    command: ['sleep', '36000']
 #    networks:
 #    - logging
-#    environment: ['ELASTIC_VERSION=${ELASTIC_VERSION:-6.4.2}','ES_PASSWORD=${ES_PASSWORD:-changeme}','DEFAULT_INDEX_PATTERN=${DEFAULT_INDEX_PATTERN:-metricbeat-*}']
+#    environment: ['ELASTIC_VERSION=${ELASTIC_VERSION:-6.5.0}','ES_PASSWORD=${ES_PASSWORD:-changeme}','DEFAULT_INDEX_PATTERN=${DEFAULT_INDEX_PATTERN:-metricbeat-*}']
 #    depends_on:
 #    - elasticsearch
 #    - kibana
@@ -217,10 +423,15 @@ services:
 #        delay: 10s
 #      restart_policy:
 #        condition: none
+#      placement:
+#        constraints:
+#        - node.hostname == ip-172-31-31-196.us-east-2.compute.internal
 
 volumes:
   elasticsearch-data:
     external: true
+  filebeat-data:
+    driver: local
 
 configs:
   elastic_config:

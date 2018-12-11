@@ -1,0 +1,26 @@
+version: '3.7'
+
+services:
+
+  fix-file-permissions:
+    image: alpine
+    hostname: fix-file-permissions
+    command: >
+      sh -c "chown -R 1000 /usr/share/elasticsearch/data &&
+             chgrp -R 1000 /usr/share/elasticsearch/data &&
+             chown 1000 /usr/share/elasticsearch/data/lost\+found &&
+             chgrp 1000 /usr/share/elasticsearch/data/lost\+found &&
+             echo File Permissions changed"
+    volumes:
+    - elasticsearch-data:/usr/share/elasticsearch/data
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: none
+
+volumes:
+  elasticsearch-data:
+    external: true

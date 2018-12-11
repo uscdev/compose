@@ -58,6 +58,6 @@ do
      echo "Loading $template_id template..."
      curl -s  -H 'Content-Type: application/json' -XPUT http://elastic:${ES_PASSWORD}@elasticsearch:9200/_template/$template_id -d@$f
      #We assume we want an index pattern in kibana
-     curl -s -XPUT http://elastic:${ES_PASSWORD}@elasticsearch:9200/.kibana/index-pattern/$template_id-* \
+     curl -s  -H "Content-Type: application/json" -XPUT http://elastic:${ES_PASSWORD}@elasticsearch:9200/.kibana/index-pattern/$template_id-* \
      -d "{\"title\" : \"$template_id-*\",  \"timeFieldName\": \"@timestamp\"}"
 done
