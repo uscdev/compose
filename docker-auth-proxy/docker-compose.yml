@@ -1,7 +1,42 @@
-docker run -d \
---env CA_CRT=$(cat ca.pem) \
---env SERVER_KEY=$(cat server_key.pem) \
---env SERVER_CRT=$(cat server_cert.pem) \
---volume /var/run/docker.sock:/var/run/docker.sock
---net=host
-nicholasdille/docker-auth-proxy
+version: '3.7'
+
+services:
+  docker-auth-proxy:
+    image: nicholasdille/docker-auth-proxy
+    ports:
+    - "2376:2376"
+#    networks:
+#      hostnet: {}
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    secrets:
+    - ca.pem
+    - server_key.pem
+    - server_cert.pem
+    environment:
+      CA_CRT: /run/secrets/ca.pem
+      SERVER_KEY: /run/secrets/server_key.pem
+      SERVER_CRT: /run/secrets/server_cert.pem
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+#networks:
+#  hostnet:
+##    driver: local
+#    external: true
+#    name: host
+##    attachable: true
+secrets:
+  ca.pem:
+    external: true
+  server_key.pem:
+    external: true
+  server_cert.pem:
+    external: true
