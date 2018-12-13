@@ -19,9 +19,9 @@ services:
         delay: 10s
       restart_policy:
         condition: none
-      placement:
-        constraints:
-        - node.hostname==ip-172-31-2-178.us-east-2.compute.internal
+#      placement:
+#        constraints:
+#        - node.hostname==ip-172-31-13-151.us-east-2.compute.internal
 
 volumes:
   elasticsearch-data:

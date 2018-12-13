@@ -55,6 +55,7 @@ services:
   db:
 #    image: mysql:5.7
     image: uscdev/guacamole-mysql-populated:5.7
+#    command: sleep 30000
     hostname: db
     networks:
     - db
@@ -73,6 +74,9 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
+#      placement:
+#        constraints:
+#          - node.hostname==ip-172-31-13-131.us-east-2.compute.internal
 
 networks:
   guacd:
