@@ -27,6 +27,8 @@ docker stack deploy --compose-file $COMPOSE_PATH/selenium/docker-compose.yml sel
 # shutdown setup program (or change to use remote db)
 docker stack deploy --compose-file $COMPOSE_PATH/guacamole/docker-compose.yml guacamole
 
+docker stack deploy --compose-file $COMPOSE_PATH/sonarqube/docker-compose.yml sonarqube
+
 docker stack deploy --compose-file $COMPOSE_PATH/wordpress/docker-compose.yml wordpress
 docker stack deploy --compose-file $COMPOSE_PATH/windows/docker-compose.yml windows
 docker stack deploy --compose-file $COMPOSE_PATH/hello-dual/docker-compose.yml hello-dual

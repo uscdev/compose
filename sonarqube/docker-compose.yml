@@ -6,6 +6,7 @@ services:
     ports:
     - "9000:9000"
     networks:
+    - proxy
     - sonarnet
     environment:
     - sonar.jdbc.url=jdbc:postgresql://db:5432/sonar
@@ -13,6 +14,17 @@ services:
     - sonarqube_conf:/opt/sonarqube/conf
     - sonarqube_data:/opt/sonarqube/data
     - sonarqube_extensions:/opt/sonarqube/extensions
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.port=9000
+        - com.df.httpsOnly=true
+        - com.df.serviceDomain=sonarqube.${DOMAIN_NAME:-docker.usc.edu}
 
   db:
     image: postgres
@@ -29,6 +41,8 @@ services:
 networks:
   sonarnet:
     driver: overlay
+  proxy:
+    external: true
 
 volumes:
   sonarqube_conf:
