@@ -28,6 +28,7 @@ docker stack deploy --compose-file $COMPOSE_PATH/selenium/docker-compose.yml sel
 docker stack deploy --compose-file $COMPOSE_PATH/guacamole/docker-compose.yml guacamole
 
 docker stack deploy --compose-file $COMPOSE_PATH/sonarqube/docker-compose.yml sonarqube
+# + docker stack deploy --compose-file $COMPOSE_PATH/security/clair/docker-compose.yml clair
 
 docker stack deploy --compose-file $COMPOSE_PATH/wordpress/docker-compose.yml wordpress
 docker stack deploy --compose-file $COMPOSE_PATH/windows/docker-compose.yml windows
