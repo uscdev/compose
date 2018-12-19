@@ -1,25 +1,47 @@
-version: '3'
+version: '3.7'
 services:
 
   clair:
-    container_name: clair_clair
     image: quay.io/coreos/clair-git:latest
-    restart: unless-stopped
+    command: [-config, /config/config.yaml]
     depends_on:
       - postgres
     ports:
       - "6060:6060"
       - "6061:6061"
-    links:
+    networks:
       - postgres
-    volumes:
-      - /tmp:/tmp
-      - ./clair_config:/config
-    command: [-config, /config/config.yaml]
+    configs:
+      - source: clair_config
+        target: /config/config.yaml
+#    volumes:
+#      - /tmp:/tmp
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
 
   postgres:
-    container_name: clair_postgres
     image: postgres:latest
-    restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: password
+    networks:
+      - postgres
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+networks:
+  postgres:
+    driver: overlay
+
+configs:
+  clair_config:
+    file: ./clair_config/config.yaml
