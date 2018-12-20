@@ -3,14 +3,14 @@ services:
 
   falco:
     image: falcosecurity/falco
-    privileged: true
+#    privileged: true
     volumes:
       - /var/run/docker.sock:/host/var/run/docker.sock
-      - /dev:/host/dev
-      - /proc:/host/proc:ro
-      - /boot:/host/boot:ro
-      - /lib/modules:/host/lib/modules:ro
-      - /usr:/host/usr:ro
+      - /host/dev:/dev
+      - /host/proc:/proc:ro
+      - /host/boot:/boot:ro
+      - /host/lib/modules:/lib/modules:ro
+      - /host/usr:/usr:ro
     networks:
       - logging
     deploy:
@@ -22,3 +22,7 @@ services:
         condition: on-failure
       labels:
         - security.monitor=falco
+
+networks:
+  logging:
+    external: true
