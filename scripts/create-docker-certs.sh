@@ -1,4 +1,4 @@
-export HOST=host.usc.edu
+export HOST=0.0.0.0.xip.io
 export PASSWORD=password
 export COUNTRY=US
 export STATE=California
@@ -6,7 +6,7 @@ export CITY=Los\ Angeles
 export ORGANIZATION=University\ of\ Southern\ California
 export UNIT=Information\ Technology\ Services
 export EMAIL=dcorley\@usc.edu
-export OTHER_HOSTS=DNS:$HOST,DNS:host1.usc.edu,DNS:host2.usc.edu,DNS:host3.usc.edu,IP:127.0.0.1
+export OTHER_HOSTS=DNS:0.0.0.0.xip.io,DNS:*.0.0.0.0.xip.io,DNS:127.0.0.1.xip.io,DNS:*.127.0.0.1.xip.io,IP:127.0.0.1,IP:0.0.0.0
 
 #  on the Docker daemon’s host machine, generate CA private and public keys
 openssl genrsa -aes256 -out ca-key.pem 4096
