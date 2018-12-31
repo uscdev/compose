@@ -8,7 +8,10 @@ RUN add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debia
 RUN apt-get update
 RUN apt-get install -y docker-ce
 
+# RUN groupadd docker
+# RUN $ sudo usermod -aG docker $USER
+RUN chmod a+rw /var/run/docker.sock
 RUN rm /etc/nginx/conf.d/default.conf
-COPY etc/nginx/conf.d /etc/nginx/conf.d
+COPY etc /etc
 
 EXPOSE 2376
