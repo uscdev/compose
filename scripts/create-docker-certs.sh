@@ -6,7 +6,7 @@ export CITY=Los\ Angeles
 export ORGANIZATION=University\ of\ Southern\ California
 export UNIT=Information\ Technology\ Services
 export EMAIL=dcorley\@usc.edu
-export OTHER_HOSTS=DNS:0.0.0.0.xip.io,DNS:*.0.0.0.0.xip.io,DNS:127.0.0.1.xip.io,DNS:*.127.0.0.1.xip.io,IP:127.0.0.1,IP:0.0.0.0
+export OTHER_HOSTS=DNS:0.0.0.0.xip.io,DNS:*.0.0.0.0.xip.io,DNS:127.0.0.1.xip.io,DNS:*.127.0.0.1.xip.io,DNS:docker-proxy,IP:127.0.0.1,IP:0.0.0.0
 
 #  on the Docker daemon’s host machine, generate CA private and public keys
 openssl genrsa -aes256 -out ca-key.pem 4096

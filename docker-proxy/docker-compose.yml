@@ -1,8 +1,8 @@
 version: '3.7'
 
 services:
-  docker-auth-proxy:
-    image: uscdev/docker-auth-proxy
+  docker-proxy:
+    image: uscdev/docker-proxy
 #    command: sleep 36000
     ports:
     - "2377:2376"
