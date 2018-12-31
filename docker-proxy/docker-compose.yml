@@ -6,8 +6,8 @@ services:
 #    command: sleep 36000
     ports:
     - "2377:2376"
-#    networks:
-#      hostnet: {}
+    networks:
+    - docker-proxy
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock
     secrets:
@@ -28,12 +28,9 @@ services:
       restart_policy:
         condition: on-failure
 
-#networks:
-#  hostnet:
-##    driver: local
-#    external: true
-#    name: host
-##    attachable: true
+networks:
+  docker-proxy:
+    external: true
 secrets:
   ca.pem:
     external: true
