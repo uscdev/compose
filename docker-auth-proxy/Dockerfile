@@ -1,14 +1,7 @@
 FROM nginx:stable-alpine
 
-COPY entrypoint.sh /
-COPY proxy.conf /etc/nginx/conf.d/
-
-RUN chmod +x /entrypoint.sh \
- && sed -i 's/user  nginx;/user  root;/' /etc/nginx/nginx.conf
-
-ENV CA_CRT=""
-ENV SERVER_KEY=""
-ENV SERVER_CRT=""
-ENTRYPOINT [ "/entrypoint.sh" ]
+RUN apk update && apk upgrade
+RUN rm /etc/nginx/conf.d/default.conf
+COPY etc/nginx/conf.d /etc/nginx/conf.d
 
 EXPOSE 2376

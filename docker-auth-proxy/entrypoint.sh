@@ -13,6 +13,7 @@ if test -z "${SERVER_CRT}"; then
     exit 1
 fi
 
-echo "${CA_CRT}" > /etc/nginx/certs/ca.pem
-echo "${SERVER_KEY}" > /etc/nginx/certs/server-key.pem
-echo "${SERVER_CRT}" > /etc/nginx/certs/server-cert.pem
+mkdir -p /etc/nginx/certs
+cat "${CA_CRT}" > /etc/nginx/certs/ca.pem
+cat "${SERVER_KEY}" > /etc/nginx/certs/server-key.pem
+cat "${SERVER_CRT}" > /etc/nginx/certs/server-cert.pem

@@ -2,7 +2,8 @@ version: '3.7'
 
 services:
   docker-auth-proxy:
-    image: nicholasdille/docker-auth-proxy
+    image: uscdev/docker-auth-proxy
+#    command: sleep 36000
     ports:
     - "2376:2376"
 #    networks:
@@ -11,12 +12,12 @@ services:
     - /var/run/docker.sock:/var/run/docker.sock
     secrets:
     - ca.pem
-    - server_key.pem
-    - server_cert.pem
+    - server-key.pem
+    - server-cert.pem
     environment:
       CA_CRT: /run/secrets/ca.pem
-      SERVER_KEY: /run/secrets/server_key.pem
-      SERVER_CRT: /run/secrets/server_cert.pem
+      SERVER_KEY: /run/secrets/server-key.pem
+      SERVER_CRT: /run/secrets/server-cert.pem
     deploy:
       replicas: 1
       placement:
@@ -36,7 +37,7 @@ services:
 secrets:
   ca.pem:
     external: true
-  server_key.pem:
+  server-key.pem:
     external: true
-  server_cert.pem:
+  server-cert.pem:
     external: true
