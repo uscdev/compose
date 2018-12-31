@@ -5,7 +5,7 @@ services:
     image: uscdev/docker-auth-proxy
 #    command: sleep 36000
     ports:
-    - "2375:2375"
+    - "2377:2376"
 #    networks:
 #      hostnet: {}
     volumes:

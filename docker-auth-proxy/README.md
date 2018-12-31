@@ -1,6 +1,6 @@
 # Supported tags and respective `Dockerfile` links
 
-- [`latest`](https://github.com/nicholasdille/docker-auth-proxy/blob/master/Dockerfile)
+- Thanks nicholasdille/docker-auth-proxy
 
 # Purpose
 
@@ -11,27 +11,21 @@ This container image launches nginx as a reverse proxy. It listens on port 2376/
 The reverse proxy listens on port 2376/tcp using TLS. All requests are forwarded to the Docker daemon socket which must be mapped:
 
 ```bash
-docker run -d \
-    --env CA_CRT=$(cat ca.pem) \
-    --env SERVER_KEY=$(cat server_key.pem) \
-    --env SERVER_CRT=$(cat server_cert.pem) \
-    --net=host
-    --volume /var/run/docker.sock:/var/run/docker.sock
-    nicholasdille/docker-auth-proxy
+Use the compose file.
 ```
 
 The certificates must be created manually before starting the reverse proxy. Please refer to the official documentation how to [protect the Docker daemon socket](https://docs.docker.com/engine/security/https/).
 
-The following variables are supported:
+The certificates must be installed as secrets:
 
-## `CA_CRT`
+## `ca.pem`
 
 ... must contain the PEM formatted certificate for the certificate authority
 
-## `SERVER_KEY`
+## `server-key.pem`
 
 ... must contain the PEM formatted private key for the server certificate
 
-## `SERVER_CRT`
+## `server-cert.pem`
 
 ... must contain the PEM formatted server certificate
