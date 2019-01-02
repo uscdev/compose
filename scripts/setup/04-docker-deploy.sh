@@ -30,6 +30,9 @@ docker stack deploy --compose-file $COMPOSE_PATH/guacamole/docker-compose.yml gu
 docker stack deploy --compose-file $COMPOSE_PATH/sonarqube/docker-compose.yml sonarqube
 # + docker stack deploy --compose-file $COMPOSE_PATH/security/clair/docker-compose.yml clair
 
+docker stack deploy --compose-file $COMPOSE_PATH/jenkins/docker-compose.yml jenkins
+docker stack deploy --compose-file $COMPOSE_PATH/jenkins-swarm-agent/docker-compose.yml jenkins-swarm-agent
+
 docker stack deploy --compose-file $COMPOSE_PATH/wordpress/docker-compose.yml wordpress
 docker stack deploy --compose-file $COMPOSE_PATH/windows/docker-compose.yml windows
 docker stack deploy --compose-file $COMPOSE_PATH/hello-dual/docker-compose.yml hello-dual

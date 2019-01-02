@@ -3,6 +3,7 @@
 export SECRET_PATH=/run/secrets
 export PEM_PATH=$SECRET_PATH/certificates/usc
 export SELF_PATH=$SECRET_PATH/certificates/self
+export DOCKER_PATH=$SECRET_PATH/certificates/docker
 
 docker secret create apache.crt $SELF_PATH/apache.crt
 docker secret create apache.key $SELF_PATH/apache.key
@@ -11,6 +12,13 @@ docker secret create sp-key.pem $SELF_PATH/sp-key.pem
 
 export SITE=swarm
 export DOMAIN_NAME=$SITE.usc.edu
+
+docker secret create ca.pem $DOCKER_PATH/$DOMAIN_NAME/server-certs/ca.pem
+docker secret create server-cert.pem $DOCKER_PATH/$DOMAIN_NAME/server-certs/server-cert.pem
+docker secret create server-key.pem $DOCKER_PATH/$DOMAIN_NAME/server-certs/server-key.pem
+docker secret create cert.pem $DOCKER_PATH/$DOMAIN_NAME/client-certs/cert.pem
+docker secret create key.pem $DOCKER_PATH/$DOMAIN_NAME/client-certs/key.pem
+
 docker secret create cert-$DOMAIN_NAME.pem $PEM_PATH/$DOMAIN_NAME/haproxy/cert-$DOMAIN_NAME.pem
 docker secret create $DOMAIN_NAME.key $PEM_PATH/$DOMAIN_NAME/csr/$DOMAIN_NAME.key
 docker secret create $DOMAIN_NAME.cer $PEM_PATH/$DOMAIN_NAME/nginx/$DOMAIN_NAME.cer

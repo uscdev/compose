@@ -14,7 +14,7 @@ services:
       - proxy
       - docker-proxy
     volumes:
-      - ${USC_BLOCK_DIR:-/docker-nfs}/jenkins:/var/jenkins_home
+      - jenkins-data:/var/jenkins_home
     secrets:
       - ca.pem
       - cert.pem
@@ -34,9 +34,13 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
-      placement:
-        constraints:
-          - node.hostname==${NODE01:-dcorley-swarm-node01.usc.edu}
+#      placement:
+#        constraints:
+#          - node.hostname==${NODE01:-dcorley-swarm-node01.usc.edu}
+volumes:
+  jenkins-data:
+    external: true
+    name: ${JENKINS_DATA:-jenkins-data}
 networks:
   proxy:
     external: true
