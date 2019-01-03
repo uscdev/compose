@@ -5,7 +5,7 @@ services:
     image: uscdev/docker-proxy
 #    command: sleep 36000
     ports:
-    - "2377:2376"
+    - "2376:2376"
     networks:
     - docker-proxy
     volumes:

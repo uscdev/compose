@@ -7,7 +7,7 @@ services:
     networks:
     - proxy
     volumes:
-    - ${USC_BLOCK_DIR:-/docker-nfs}/nexus:/nexus-data
+    - nexus-data:/nexus-data
 #    secrets:
 #      - keystore.jks
     deploy:
@@ -31,18 +31,18 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
-      placement:
-        constraints:
-        - node.hostname==${NODE01}
+#      placement:
+#        constraints:
+#        - node.hostname==${NODE01}
 #    environment:
 #      - INSTALL4J_ADD_VM_PARAMS=-DJETTY_PASSWORD=${USC_NEXUS_KEYSTORE_PASSWORD}
 networks:
   proxy:
     external: true
-#volumes:
-#  nexus-data:
-#    external:
-#      name: ${NEXUS_DATA:-nexus-data}
+volumes:
+  nexus-data:
+    external: true
+    name: ${NEXUS_DATA:-nexus-data}
 # secrets:
 #  keystore.jks:
 #    external: true

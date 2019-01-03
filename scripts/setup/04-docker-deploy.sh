@@ -32,6 +32,9 @@ docker stack deploy --compose-file $COMPOSE_PATH/sonarqube/docker-compose.yml so
 
 docker stack deploy --compose-file $COMPOSE_PATH/jenkins/docker-compose.yml jenkins
 docker stack deploy --compose-file $COMPOSE_PATH/jenkins-swarm-agent/docker-compose.yml jenkins-swarm-agent
+docker stack deploy --compose-file $COMPOSE_PATH/nexus/docker-compose.yml nexus
+
+docker stack deploy --compose-file $COMPOSE_PATH/docker-proxy/docker-compose.yml docker-proxy
 
 docker stack deploy --compose-file $COMPOSE_PATH/wordpress/docker-compose.yml wordpress
 docker stack deploy --compose-file $COMPOSE_PATH/windows/docker-compose.yml windows

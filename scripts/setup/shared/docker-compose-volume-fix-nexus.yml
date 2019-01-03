@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+
+  fix-file-permissions:
+    image: alpine
+    hostname: fix-file-permissions
+    command: >
+      sh -c "chown -R 1000 /nexus-data &&
+             chgrp -R 1000 /nexus-data &&
+             chown 1000 /nexus-data/lost\+found &&
+             chgrp 1000 /nexus-data/lost\+found &&
+             echo File Permissions changed"
+    volumes:
+    - nexus-data:/nexus-data
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: none
+
+volumes:
+  nexus-data:
+    external: true
+    name: ${NEXUS_DATA:-nexus-data}
