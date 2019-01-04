@@ -2,21 +2,21 @@ version: '3.7'
 services:
 
   clair:
-    image: quay.io/coreos/clair:latest
+    image: quay.io/coreos/clair-git:latest
     command: [-config, /config/config.yaml]
     depends_on:
       - postgres
+      - clair
     ports:
       - "6060:6060"
       - "6061:6061"
     networks:
       - postgres
-      - clair
     configs:
       - source: clair_config
         target: /config/config.yaml
-    volumes:
-      - /tmp:/tmp
+#    volumes:
+#      - /tmp:/tmp
     deploy:
       replicas: 1
       update_config:

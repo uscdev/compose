@@ -1,0 +1,27 @@
+version: '3.7'
+services:
+
+  klar:
+    image:  vitaliibalashov/klar
+    command: ["postgres:9.5.1"]
+    networks:
+      - clair
+    env_file:
+      - klar.env
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: none
+
+networks:
+  clair:
+    external: true
+#    driver: overlay
+#    attachable: true
+
+#configs:
+#  clair_config:
+#    file: ./clair_config/config.yaml
