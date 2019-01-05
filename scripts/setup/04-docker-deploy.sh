@@ -14,6 +14,7 @@ export COMPOSE_PATH=$USC_DEV_PATH/compose
 export DEVOPS_PATH=$USC_DEV_PATH/devops-example
 
 docker stack deploy --compose-file $COMPOSE_PATH/proxy/docker-compose.yml proxy
+docker stack deploy --compose-file $COMPOSE_PATH/docker-proxy/docker-compose.yml docker-proxy
 
 docker stack deploy --compose-file $COMPOSE_PATH/visualizer/docker-compose.yml visualizer
 docker stack deploy --compose-file $COMPOSE_PATH/portainer/docker-compose.yml portainer
@@ -28,13 +29,11 @@ docker stack deploy --compose-file $COMPOSE_PATH/selenium/docker-compose.yml sel
 docker stack deploy --compose-file $COMPOSE_PATH/guacamole/docker-compose.yml guacamole
 
 docker stack deploy --compose-file $COMPOSE_PATH/sonarqube/docker-compose.yml sonarqube
-# + docker stack deploy --compose-file $COMPOSE_PATH/security/clair/docker-compose.yml clair
+docker stack deploy --compose-file $COMPOSE_PATH/security/clair/docker-compose.yml clair
 
 docker stack deploy --compose-file $COMPOSE_PATH/jenkins/docker-compose.yml jenkins
 docker stack deploy --compose-file $COMPOSE_PATH/jenkins-swarm-agent/docker-compose.yml jenkins-swarm-agent
 docker stack deploy --compose-file $COMPOSE_PATH/nexus/docker-compose.yml nexus
-
-docker stack deploy --compose-file $COMPOSE_PATH/docker-proxy/docker-compose.yml docker-proxy
 
 docker stack deploy --compose-file $COMPOSE_PATH/wordpress/docker-compose.yml wordpress
 docker stack deploy --compose-file $COMPOSE_PATH/windows/docker-compose.yml windows

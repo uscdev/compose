@@ -39,7 +39,7 @@ services:
       - com.df.distribute=true
       - com.df.port=9000
       - com.df.httpsOnly=true
-      - com.df.serviceDomain=portainer.${DOMAIN_NAME:-docker.usc.edu}
+      - com.df.serviceDomain=${PORTAINER_SUB_DOMAIN:-portainer}.${DOMAIN_NAME:-docker.usc.edu}
 
 networks:
   default:

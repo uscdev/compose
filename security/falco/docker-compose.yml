@@ -6,11 +6,11 @@ services:
 #    privileged: true
     volumes:
       - /var/run/docker.sock:/host/var/run/docker.sock
-      - /host/dev:/dev
-      - /host/proc:/proc:ro
-      - /host/boot:/boot:ro
-      - /host/lib/modules:/lib/modules:ro
-      - /host/usr:/usr:ro
+      - /dev:/host/dev
+      - /proc:/host/proc:ro
+      - /boot:/host/boot:ro
+      - /lib/modules:/host/lib/modules:ro
+      - /usr:/host/usr:ro
     networks:
       - logging
     deploy:
