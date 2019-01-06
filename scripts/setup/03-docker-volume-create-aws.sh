@@ -22,7 +22,7 @@ docker volume create -d "cloudstor:aws" \
   --opt size=30 \
   --opt backing=relocatable \
   nexus-data
-docker stack deploy --compose-file ./shared/docker-compose-volume-fix-nexus.yml jenkins-fix-volume
+docker stack deploy --compose-file ./shared/docker-compose-volume-fix-nexus.yml nexus-fix-volume
 
 docker volume create -d "cloudstor:aws" \
   --opt size=30 \
