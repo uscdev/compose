@@ -2,7 +2,7 @@ version: '3.7'
 services:
 
   centos1:
-    image: centos
+    image: centos:${CENTOS_TAG:-latest}
     hostname: centos1
     command: sleep 36000
     volumes:

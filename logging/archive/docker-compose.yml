@@ -3,7 +3,7 @@ version: '3.7'
 services:
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_TAG:-latest}
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -20,7 +20,7 @@ services:
       - elk
 
   logstash:
-    image: docker.elastic.co/logstash/logstash
+    image: docker.elastic.co/logstash/logstash:${ELASTICSEARCH_TAG:-latest}
     volumes:
       - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
       - ./logstash/pipeline:/usr/share/logstash/pipeline
@@ -34,7 +34,7 @@ services:
       - elasticsearch
 
   kibana:
-    build: docker.elastic.co/kibana/kibana
+    build: docker.elastic.co/kibana/kibana:${ELASTICSEARCH_TAG:-latest}
     volumes:
       - ./kibana/config/:/usr/share/kibana/config
     ports:

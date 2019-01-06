@@ -2,7 +2,7 @@ version: '3.7'
 services:
 
   guacamole:
-    image: guacamole/guacamole
+    image: guacamole/guacamole:${GUACAMOLE_TAG:-latest}
     hostname: guacamole
     ports:
     - 8082:8080
@@ -37,7 +37,7 @@ services:
         condition: on-failure
 
   guacd:
-    image: guacamole/guacd
+    image: guacamole/guacd:${GUACD_TAG:-latest}
     hostname: guacd
     networks:
     - test
@@ -53,8 +53,8 @@ services:
         condition: on-failure
 
   db:
-#    image: mysql:5.7
-    image: uscdev/guacamole-mysql-populated:5.7
+#    image: mysql:${GUACAMOLE_MYSQL_TAG:-5.7}
+    image: uscdev/guacamole-mysql-populated:${GUACAMOLE_MYSQL_TAG:-5.7}
 #    command: sleep 30000
     hostname: db
     networks:

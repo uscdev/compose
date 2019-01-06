@@ -1,4 +1,4 @@
-version: '3.5'
+version: '3.7'
 services:
   nginx-dtr:
     image: uscdev/nginx-dtr:swarm-1.0.0

@@ -2,7 +2,7 @@ version: "3.7"
 services:
 
   selenium:
-    image: selenium/hub
+    image: selenium/hub:${SELENIUM_HUB_TAG:-latest}
     hostname: selenium
     entrypoint: bash -c 'SE_OPTS="-host 0.0.0.0 -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
     networks:
@@ -22,7 +22,7 @@ services:
         condition: on-failure
 
   chrome:
-    image: selenium/node-chrome-debug
+    image: selenium/node-chrome-debug:${SELENIUM_CHROME_TAG:-latest}
     hostname: chrome
     entrypoint: bash -c 'SE_OPTS="-host 0.0.0.0 -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
 #    entrypoint: >
@@ -63,7 +63,7 @@ services:
 #        constraints: [node.role == worker]
 
   firefox:
-    image: selenium/node-firefox-debug
+    image: selenium/node-firefox-debug:${SELENIUM_FIREFOX_TAG:-latest}
     hostname: firefox
     entrypoint: bash -c 'SE_OPTS="-host 0.0.0.0 -port 4444" /usr/bin/supervisord --configuration /etc/supervisord.conf'
 #    entrypoint: >

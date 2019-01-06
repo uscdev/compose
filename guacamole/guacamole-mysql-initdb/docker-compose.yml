@@ -2,7 +2,7 @@ version: '3.7'
 services:
 
   db:
-    image: uscdev/guacamole-mysql-populated:5.7
+    image: uscdev/guacamole-mysql-populated:${GUACAMOLE_MYSQL_TAG:-5.7}
     hostname: db
 #    command: sleep 36000
     volumes:

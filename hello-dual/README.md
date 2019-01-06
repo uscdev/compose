@@ -5,7 +5,7 @@ This dockerfile builds an automatic reverse-proxy
 
 Check out the hello-world program for a configuration example:
 ````bash
-version: '3.1'
+version: '3.7'
 
 services:
   helloworld:

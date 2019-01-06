@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   ubuntu:
-    image: centos:7
+    image: centos:${CENTOS_TAG:-latest}
     volumes:
     - nexus-data:/nexus-data
     command: chown -R 1000 /nexus-data && chgrp -R 1000 /nexus-data

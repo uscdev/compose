@@ -2,7 +2,7 @@ version: '3.7'
 services:
 
   wordpress-selenium-test:
-    image: uscdev/wordpress-selenium-test
+    image: uscdev/wordpress-selenium-test:${WORDPRESS_SELENIUM_TEST_TAG:-latest}
     hostname: wordpress-selenium-test
     networks:
     - selenium

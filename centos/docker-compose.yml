@@ -2,7 +2,7 @@ version: '3.7'
 services:
 
   centos1:
-    image: centos
+    image: centos:${CENTOS_TAG:-latest}
     hostname: centos1
     command: sleep 36000
     networks:
@@ -17,7 +17,7 @@ services:
         condition: on-failure
 
   centos2:
-    image: centos
+    image: centos:${CENTOS_TAG:-latest}
     hostname: centos2
     command: sleep 36000
     networks:
@@ -32,7 +32,7 @@ services:
         condition: on-failure
 
   centos3:
-    image: centos
+    image: centos:${CENTOS_TAG:-latest}
     hostname: centos3
     command: sleep 36000
     networks:

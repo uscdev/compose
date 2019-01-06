@@ -3,7 +3,7 @@ version: "3.7"
 services:
 
   proxy:
-    image: dockerflow/docker-flow-proxy:${TAG:-latest}
+    image: dockerflow/docker-flow-proxy:${DOCKER_FLOW_PROXY_TAG:-latest}
     ports:
     - 80:80
     - 443:443
@@ -25,7 +25,7 @@ services:
       - cert-device-registration.usc.edu.pem
 
   swarm-listener:
-    image: dockerflow/docker-flow-swarm-listener
+    image: dockerflow/docker-flow-swarm-listener:${DOCKER_FLOW_SWARM_LISTENER_TAG:-latest}
     networks:
     - proxy
     volumes:

@@ -3,7 +3,7 @@ version: '3.7'
 services:
 
   fix-file-permissions:
-    image: alpine
+    image: alpine:${ALPINE_TAG:-latest}
     hostname: fix-file-permissions
     command: >
       sh -c "chown -R 1000 /nexus-data &&

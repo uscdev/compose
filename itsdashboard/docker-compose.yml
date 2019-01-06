@@ -1,7 +1,7 @@
-version: '3.1'
+version: '3.7'
 services:
   itsdashboard:
-    image: dtr.docker.usc.edu/itsdashboard
+    image: dtr.docker.usc.edu/itsdashboard:${ITSDASHBOARD_TAG:-latest}
 #    ports:
 #      - 8082:80
     networks:

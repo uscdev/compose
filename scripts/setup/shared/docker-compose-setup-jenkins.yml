@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   ubuntu:
-    image: ubuntu
+    image: ubuntu:${UBUNTU_TAG:-latest}
     volumes:
     - jenkins-data:/var/jenkins_home
     command: chown -R 1000 /var/jenkins_home && chgrp -R 1000 /var/jenkins_home

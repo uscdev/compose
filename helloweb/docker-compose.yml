@@ -1,7 +1,7 @@
-version: '3.1'
+version: '3.7'
 services:
   helloweb:
-    image: dtr.docker.usc.edu/helloweb
+    image: dtr.docker.usc.edu/helloweb:${HELLOWEB_TAG:-latest}
     networks:
       web-bus:
     ports:

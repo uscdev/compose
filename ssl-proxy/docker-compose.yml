@@ -1,7 +1,7 @@
-version: '3.1'
+version: '3.7'
 services:
   ssl-proxy:
-    image: uscdev/ssl-proxy
+    image: uscdev/ssl-proxy:${SSL_PROXY_TAG:-latest}
     ports:
 #      - 80:80
 #      - 443:443

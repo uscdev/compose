@@ -1,9 +1,9 @@
-version: '3'
+version: '3.7'
 
 services:
 
   visualizer:
-    image: dockersamples/visualizer
+    image: dockersamples/visualizer:${VISUALIZER_TAG:-latest}
     environment:
     - CTX_ROOT=/
     networks:

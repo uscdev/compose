@@ -1,8 +1,8 @@
-version: '3'
+version: '3.7'
 services:
 
   falco:
-    image: falcosecurity/falco
+    image: falcosecurity/falco:${FALCO_TAG:-latest}
 #    privileged: true
     volumes:
       - /var/run/docker.sock:/host/var/run/docker.sock

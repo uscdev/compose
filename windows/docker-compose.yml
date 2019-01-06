@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   shib-service-iis:
-    image: uscdev/shib-service
+    image: uscdev/shib-service:${SHIB_SERVICE_TAG:-latest}
     environment:
     - SERVER_NAME=${SERVER_NAME}
     - PROXY_URL=http://hello-iis:80/
@@ -28,7 +28,7 @@ services:
       - com.df.port=443
       - com.df.sslVerifyNone=true
   hello-iis:
-    image: microsoft/iis
+    image: microsoft/iis:${IIS_TAG:-latest}
     networks:
       - proxy
     deploy:

@@ -1,8 +1,8 @@
-version: '3.1'
+version: '3.7'
 
 services:
   whoami:
-    image: emilevauge/whoami
+    image: emilevauge/whoami:${WHOAMI_TAG:-latest}
     networks:
       web-bus:
 networks:

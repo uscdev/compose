@@ -1,8 +1,8 @@
-version: "3"
+version: "3.7"
 
 services:
   sonarqube:
-    image: sonarqube
+    image: sonarqube:${SONARQUBE_TAG:-latest}
     ports:
     - "9000:9000"
     networks:
@@ -29,7 +29,7 @@ services:
         - com.df.serviceDomain=sonarqube.${DOMAIN_NAME:-docker.usc.edu}
 
   db:
-    image: postgres
+    image: postgres:${SONARQUBE_POSTGRES_TAG:-latest}
     networks:
     - sonarnet
     environment:

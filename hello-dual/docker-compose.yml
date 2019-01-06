@@ -3,7 +3,7 @@ version: '3.7'
 services:
   helloworld1:
     hostname: helloworld1
-    image: mendhak/http-https-echo
+    image: mendhak/http-https-echo:${HTTP_ECHO_TAG:-latest}
     networks:
     - proxy
     deploy:
@@ -19,7 +19,7 @@ services:
       - com.df.port.2=80
   helloworld2:
     hostname: helloworld2
-    image: mendhak/http-https-echo
+    image: mendhak/http-https-echo:${HTTP_ECHO_TAG:-latest}
     networks:
     - proxy
     deploy:
@@ -36,7 +36,7 @@ services:
       - com.df.port.2=80
   helloworld3:
     hostname: helloworld3
-    image: mendhak/http-https-echo
+    image: mendhak/http-https-echo:${HTTP_ECHO_TAG:-latest}
     networks:
     - proxy
     deploy:

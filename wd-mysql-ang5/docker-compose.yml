@@ -1,7 +1,7 @@
-version: '3.1'
+version: '3.7'
 services:
   db:
-    image: mysql
+    image: mysql:${ANGUALR_MYSQL_TAG:-latest}
     ports:
       - 3310:3306
     environment:

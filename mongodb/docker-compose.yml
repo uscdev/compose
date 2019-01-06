@@ -1,7 +1,7 @@
-version: '3.1'
+version: '3.7'
 services:
   wd-mongodb:
-    image: mongo
+    image: mongo:${MONGO_TAG:-latest}
     command: --storageEngine wiredTiger
     ports:
       - 27017:27017

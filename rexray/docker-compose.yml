@@ -1,5 +1,5 @@
-version: '3.1'
+version: '3.7'
 services:
   rexray:
-    image: traefik
+    image: traefik:${TRAEFIK_TAG:-latest}
 

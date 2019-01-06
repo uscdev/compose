@@ -2,7 +2,7 @@ version: '3.7'
 services:
 
   ubuntu1:
-    image: ubuntu
+    image: ubuntu:${UBUNTU_TAG:-latest}
     hostname: ubuntu1
     command: sleep 36000
     networks:
@@ -17,7 +17,7 @@ services:
         condition: on-failure
 
   ubuntu2:
-    image: ubuntu
+    image: ubuntu:${UBUNTU_TAG:-latest}
     hostname: ubuntu2
     command: sleep 36000
     networks:
@@ -32,7 +32,7 @@ services:
         condition: on-failure
 
   ubuntu3:
-    image: ubuntu
+    image: ubuntu:${UBUNTU_TAG:-latest}
     hostname: ubuntu3
     command: sleep 36000
     networks:

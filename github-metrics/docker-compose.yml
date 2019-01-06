@@ -3,7 +3,7 @@ metrics:
   stdin_open: true
  expose:
   - 9171
- image: infinityworks/github-exporter:latest
+ image: infinityworks/github-exporter:${GITHUB_EXPORTER_TAG:-latest}
   environment:
    - REPOS=freeCodeCamp/freeCodeCamp,docker/docker
    - GITHUB_TOKEN=<GitHub API Token see README>

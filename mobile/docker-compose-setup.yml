@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   mobile-setup:
-    image: uscdev/mobile-setup
+    image: uscdev/mobile-setup:${MOBILE_SETUP_TAG:-latest}
     depends_on:
       - mobile-db
     networks:

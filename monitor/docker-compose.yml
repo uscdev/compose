@@ -3,7 +3,7 @@ version: "3.7"
 services:
 
   swarm-listener:
-    image: dockerflow/docker-flow-swarm-listener
+    image: dockerflow/docker-flow-swarm-listener:${DOCKER_FLOW_SWARM_LISTENER_TAG:-latest}
     networks:
     - monitor
     volumes:
@@ -65,7 +65,7 @@ services:
       replicas: 1
 
   alert-manager:
-    image: prom/alertmanager
+    image: prom/alertmanager:${ALERT_MANAGER_TAG:-latest}
     command:
     - '--config.file=/run/secrets/alert_manager_config'
     - '--storage.path=/alertmanager'
@@ -271,7 +271,7 @@ services:
 
 # See docker.com / configure-and-run-prometheus
 #  dockerd-exporter:
-#    image: stefanprodan/caddy
+#    image: stefanprodan/caddy:${CADDY_TAG:-latest}
 #    networks:
 #    - net
 #    environment:

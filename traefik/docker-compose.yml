@@ -1,7 +1,7 @@
-version: '3.1'
+version: '3.7'
 services:
   traefik:
-    image: traefik
+    image: traefik:${TRAEFIK_TAG:-latest}
     command:
         - --DefaultEntryPoints=http,https
 #        - --EntryPoints=Name:http Address::80 Redirect.EntryPoint:https

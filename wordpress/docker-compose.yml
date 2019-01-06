@@ -2,7 +2,7 @@ version: '3.7'
 services:
 
   wordpress:
-    image: wordpress:4.8.1
+    image: wordpress:${WORDPRESS_TAG:-4.8.1}
     hostname: wordpress
 #    ports:
 #      - 8101:80
@@ -34,7 +34,7 @@ services:
     - ServerName=wordpress.docker.usc.edu
 
   db:
-    image: mysql:5.7
+    image: mysql:${WORDPRESS_MYSQL_TAG:-5.7}
     hostname: db
     environment:
       MYSQL_ROOT_PASSWORD: passw0rd

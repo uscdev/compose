@@ -1,7 +1,7 @@
-version: "3.2"
+version: "3.7"
 services:
   web:
-    image: nginx:alpine
+    image: nginx:${NGINX_ALPINE_TAG:-alpine}
     volumes:
     - type: volume
       source: mydata
@@ -13,7 +13,7 @@ services:
       target: /opt/app/static
 
   db:
-    image: postgres:latest
+    image: postgres:${POSTGRES_TAG:-latest}
     volumes:
     - "/var/run/postgres/postgres.sock:/var/run/postgres/postgres.sock"
     - "dbdata:/var/lib/postgresql/data"

@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   ubuntu:
-    image: ubuntu:xenial
+    image: ubuntu:${UBUNTU_XENIAL_TAG:-xenial}
     volumes:
     - wd-mongo-data:/data/db
     command: sleep 3600

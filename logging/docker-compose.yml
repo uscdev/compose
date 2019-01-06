@@ -23,7 +23,7 @@ services:
 
   elasticsearch:
     hostname: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION:-6.5.0}
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_TAG:-6.5.0}
     environment:
     #    - xpack.security.enabled=false
     - http.host=0.0.0.0
@@ -67,7 +67,7 @@ services:
       test: ["CMD", "curl","-s" ,"-f", "-u", "elastic:${ES_PASSWORD:-changeme}", "http://localhost:9200/_cat/health"]
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:${ELK_VERSION:-6.5.0}
+    image: docker.elastic.co/logstash/logstash:${ELK_TAG:-6.5.0}
     ports:
     - "5000:5000"
     - "9600:9600"
@@ -100,7 +100,7 @@ services:
           memory: 600M
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:${ELK_VERSION:-6.5.0}
+    image: docker.elastic.co/kibana/kibana:${ELK_TAG:-6.5.0}
     ports:
     - "5601:5601"
     environment:
@@ -156,7 +156,7 @@ services:
           memory: 512m
 
   logspout:
-    image: gliderlabs/logspout:${LOGSPOUT_VERSION:-v3.2.2}
+    image: gliderlabs/logspout:${LOGSPOUT_TAG:-v3.2.2}
     networks:
     - logging
     environment:
@@ -194,7 +194,7 @@ services:
   heartbeat:
     #    container_name: heartbeat
     hostname: heartbeat
-    image: "docker.elastic.co/beats/heartbeat:${ELASTIC_VERSION:-6.5.0}"
+    image: "docker.elastic.co/beats/heartbeat:${ELASTIC_TAG:-6.5.0}"
       #    volumes:
     #Mount the heartbeat configuration so users can make edits
     configs:
@@ -228,7 +228,7 @@ services:
 #    #    container_name: filebeat
 #    hostname: filebeat
 #    user: root
-#    image: "docker.elastic.co/beats/filebeat:${ELASTIC_VERSION:-6.5.0}"
+#    image: "docker.elastic.co/beats/filebeat:${ELASTIC_TAG:-6.5.0}"
 #    configs:
 #    #Mount the filebeat configuration so users can make edit
 #    - source: filebeat_config
@@ -272,7 +272,7 @@ services:
     #    container_name: metricbeat
     hostname: metricbeat
     user: root
-    image: docker.elastic.co/beats/metricbeat:${ELASTIC_VERSION:-6.5.0}
+    image: docker.elastic.co/beats/metricbeat:${ELASTIC_TAG:-6.5.0}
     configs:
     #Mount the metricbeat configuration so users can make edit
     - source: metricbeat_config
@@ -322,7 +322,7 @@ services:
 #  packetbeat:
 #    #    container_name: packetbeat
 #    hostname: packetbeat
-#    image: "docker.elastic.co/beats/packetbeat:${ELASTIC_VERSION:-6.5.0}"
+#    image: "docker.elastic.co/beats/packetbeat:${ELASTIC_TAG:-6.5.0}"
 #    configs:
 #    #Mount the filebeat configuration so users can make edit
 #    - source: packetbeat_config
@@ -355,7 +355,7 @@ services:
   #Configure Stack container. This short lived container configures the stack once Kibana and Elasticsearch are available. More specifically, using a script it sets passwords, import dashboards, sets a default index pattern, loads templates and pipelines
   configure_stack:
     #    container_name: configure_stack
-    image: docker.elastic.co/beats/metricbeat:${ELASTIC_VERSION:-6.5.0}
+    image: docker.elastic.co/beats/metricbeat:${ELASTIC_TAG:-6.5.0}
     configs:
     - source: configure-stack
       target: /usr/local/bin/configure-stack.sh

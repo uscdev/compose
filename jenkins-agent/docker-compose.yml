@@ -1,9 +1,9 @@
-version: '3.4'
+version: '3.7'
 
 services:
 
   main:
-    image: vfarcic/jenkins-swarm-agent
+    image: vfarcic/jenkins-swarm-agent:${JENKINS_SWARM_AGENT_TAG:-latest}
     environment:
       - COMMAND_OPTIONS=-master http://ec2-54-213-228-175.us-west-2.compute.amazonaws.com:50000 -username admin -passwordEnvVariable PASSWORD_ENVVAR -labels 'docker' -executors 5
       - PASSWORD_ENVVAR=admin
