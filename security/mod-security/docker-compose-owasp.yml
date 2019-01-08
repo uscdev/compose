@@ -2,17 +2,16 @@ version: '3.7'
 
 services:
   modsecurity:
-    image: fareoffice/modsecurity
-    environment:
-      - PROXY_UPSTREAM_HOST=hello-world:80
-      - PARANOIA=3
-      - SEC_RULE_AFTER_FOO=SecRuleRemoveById 920420
+    image: owasp/modsecurity-crs:${MOD_SECURITY_TAG:-latest}
     networks:
       - proxy
+    environment:
+      PARANOIA:	1
+      PROXY: 1
+      UPSTREAM: hello-world:80
     deploy:
       replicas: 1
       labels:
-        - log.security=true   # Note - This logs security data
         - com.df.notify=true
         - com.df.distribute=true
         - com.df.serviceDomain.1=hello-proxy.${DOMAIN_NAME:-docker.usc.edu}
