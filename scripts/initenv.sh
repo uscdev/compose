@@ -64,7 +64,7 @@ unset DOCKER_CERT_PATH
 unset GRAFANA_DATA
 unset ALERTMANAGER_DATA
 
-if [ "$1" = "dcorley-swarm.usc.edu" ]; then
+if [ "$1" = "docker.usc.edu" ]; then
     export NODE00=dcorley-swarm-mgr01.usc.edu
     export NODE01=dcorley-swarm-node01.usc.edu
     export NODE02=dcorley-swarm-node02.usc.edu
