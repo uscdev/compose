@@ -1,0 +1,38 @@
+version: '3.7'
+
+services:
+  modsecurity:
+    image: owasp/modsecurity-crs:${MOD_SECURITY_TAG:-latest}
+    networks:
+      - proxy
+    environment:
+      PARANOIA:	1
+      PROXY: 1
+      UPSTREAM: hello-world:80
+    deploy:
+      replicas: 1
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.serviceDomain.1=hello-proxy.${DOMAIN_NAME:-docker.usc.edu}
+        - com.df.port.1=80
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+  hello-world:
+    image: tutum/hello-world:${HELLO_WORLD_TAG:-latest}
+    networks:
+      - proxy
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+networks:
+  proxy:
+    external: true
