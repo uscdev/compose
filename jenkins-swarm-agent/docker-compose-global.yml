@@ -1,0 +1,38 @@
+version: '3.7'
+
+services:
+
+  jenkins-swarm-agent:
+    image: uscdev/jenkins-swarm-agent
+#    hostname: jenkins-swarm-agent
+    environment:
+#    - COMMAND_OPTIONS=-master http://${JENKINS_IP:-jenkins:8080}${JENKINS_PATH:-/jenkins} -username ${MASTER_USER:-admin} -passwordEnvVariable PASSWORD_ENVVAR -labels 'docker' -executors 5
+    - COMMAND_OPTIONS=-master http://${JENKINS_IP:-jenkins:8080}${JENKINS_PATH:-/} -username ${MASTER_USER:-admin} -passwordEnvVariable PASSWORD_ENVVAR -labels 'docker' -executors 5
+    - PASSWORD_ENVVAR=${MASTER_PASS:-admin}
+#    - DOCKER_HOST=tcp://${NODEMGR:-docker-proxy}:${NODEMGRPORT:-2376}
+#    - DOCKER_TLS_VERIFY=1
+#    - DOCKER_CERT_PATH=/run/secrets
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - workspace:/workspace
+    secrets:
+    - ca.pem
+    - cert.pem
+    - key.pem
+    networks:
+    - docker-proxy
+    deploy:
+      mode: global
+volumes:
+  workspace:
+#    external: true
+networks:
+  docker-proxy:
+    external: true
+secrets:
+  ca.pem:
+    external: true
+  cert.pem:
+    external: true
+  key.pem:
+    external: true

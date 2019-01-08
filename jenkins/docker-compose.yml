@@ -34,13 +34,55 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
-#      placement:
-#        constraints:
-#          - node.hostname==${NODE01:-dcorley-swarm-node01.usc.edu}
+
+  jenkins-docker-agent:
+    image: uscdev/jenkins-swarm-agent
+    hostname: jenkins-docker-agent
+    environment:
+      - COMMAND_OPTIONS=-master http://${JENKINS_IP:-jenkins:8080}${JENKINS_PATH:-/} -username ${MASTER_USER:-admin} -passwordEnvVariable PASSWORD_ENVVAR -labels 'docker' -executors 5
+      - PASSWORD_ENVVAR=${MASTER_PASS:-admin}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - workspace:/workspace
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  jenkins-swarm-agent:
+    image: uscdev/jenkins-swarm-agent
+    hostname: jenkins-swarm-agent
+    environment:
+      - COMMAND_OPTIONS=-master http://${JENKINS_IP:-jenkins:8080}${JENKINS_PATH:-/} -username ${MASTER_USER:-admin} -passwordEnvVariable PASSWORD_ENVVAR -labels 'swarm' -executors 5
+      - PASSWORD_ENVVAR=${MASTER_PASS:-admin}
+      - DOCKER_HOST=tcp://${NODEMGR:-docker-proxy}:${NODEMGRPORT:-2376}
+      - DOCKER_TLS_VERIFY=1
+      - DOCKER_CERT_PATH=/run/secrets
+    volumes:
+      - workspace:/workspace
+    secrets:
+      - ca.pem
+      - cert.pem
+      - key.pem
+    networks:
+      - docker-proxy
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
 volumes:
   jenkins-data:
     external: true
     name: ${JENKINS_DATA:-jenkins-data}
+  workspace:
+  #    external: true
 networks:
   proxy:
     external: true
