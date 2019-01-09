@@ -10,12 +10,10 @@ docker secret create apache.key $SELF_PATH/apache.key
 docker secret create sp-cert.pem $SELF_PATH/sp-cert.pem
 docker secret create sp-key.pem $SELF_PATH/sp-key.pem
 
-echo $1
 export SITE=$1
 if [ "$SITE" = "" ]; then
     export SITE=swarm
 fi
-echo $SITE
 
 export DOMAIN_NAME=$SITE.usc.edu
 

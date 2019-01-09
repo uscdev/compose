@@ -6,7 +6,12 @@ export PEM_PATH=$SECRET_PATH/certificates/usc
 export SITE=swarm
 export DOMAIN_NAME=$SITE.usc.edu
 
-export CODE_PATH=$HOME/workspace
+export HOME_PATH=$1
+if [ "$HOME_PATH" = "" ]; then
+    export HOME_PATH=$HOME
+fi
+
+export CODE_PATH=$HOME_PATH/workspace
 export GITHUB_PATH=$CODE_PATH/github
 export USC_PATH=$CODE_PATH/usc
 export USC_DEV_PATH=$GITHUB_PATH/uscdev
@@ -32,7 +37,7 @@ docker stack deploy --compose-file $COMPOSE_PATH/sonarqube/docker-compose.yml so
 docker stack deploy --compose-file $COMPOSE_PATH/security/clair/docker-compose.yml clair
 
 docker stack deploy --compose-file $COMPOSE_PATH/jenkins/docker-compose.yml jenkins
-docker stack deploy --compose-file $COMPOSE_PATH/jenkins-swarm-agent/docker-compose.yml jenkins-swarm-agent
+#docker stack deploy --compose-file $COMPOSE_PATH/jenkins-swarm-agent/docker-compose.yml jenkins-swarm-agent
 docker stack deploy --compose-file $COMPOSE_PATH/nexus/docker-compose.yml nexus
 
 docker stack deploy --compose-file $COMPOSE_PATH/wordpress/docker-compose.yml wordpress
