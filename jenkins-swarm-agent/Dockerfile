@@ -1,4 +1,4 @@
-FROM docker:18.09
+FROM docker:latest
 
 MAINTAINER Viktor Farcic <viktor@farcic.com>
 

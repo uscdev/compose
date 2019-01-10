@@ -1,0 +1,38 @@
+FROM uscdev/jenkins-swarm-agent:latest
+
+# Thanks! MAINTAINER Viktor Farcic <viktor@farcic.com>
+MAINTAINER Don Corley <dcorley@usc.edu>
+
+ARG version="0.2.0"
+ARG build_date="unknown"
+ARG commit_hash="unknown"
+ARG vcs_url="unknown"
+ARG vcs_branch="unknown"
+
+LABEL org.label-schema.vendor="vfarcic" \
+    org.label-schema.name="jenkins-util-agent" \
+    org.label-schema.description="Jenkins agent based on the Swarm plugin" \
+    org.label-schema.usage="/src/README.md" \
+    org.label-schema.url="https://github.com/vfarcic/docker-jenkins-slave-dind/blob/master/README.md" \
+    org.label-schema.vcs-url=$vcs_url \
+    org.label-schema.vcs-branch=$vcs_branch \
+    org.label-schema.vcs-ref=$commit_hash \
+    org.label-schema.version=$version \
+    org.label-schema.schema-version="1.0" \
+    org.label-schema.build-date=$build_date
+
+ENV SWARM_CLIENT_VERSION="3.9" \
+    DOCKER_COMPOSE_VERSION="1.19.0" \
+    COMMAND_OPTIONS="" \
+    USER_NAME_SECRET="" \
+    PASSWORD_SECRET="" \
+    KLAR_VERSION="2.4.0" \
+    SONAR_VERSION=3.3.0.1492
+
+RUN wget -q https://github.com/optiopay/klar/releases/download/v${KLAR_VERSION}/klar-${KLAR_VERSION}-linux-amd64 -P /home/jenkins/ && \
+    mv /home/jenkins/klar-${KLAR_VERSION}-linux-amd64 /home/jenkins/klar && \
+    chmod +x /home/jenkins/klar
+RUN wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_VERSION}.zip -P /tmp/ && \
+    unzip tmp/sonar-scanner-cli-${SONAR_VERSION}.zip && \
+    rm /tmp/sonar-scanner-cli-${SONAR_VERSION}.zip && \
+    mv sonar-scanner-${SONAR_VERSION} /home/jenkins/sonar-scanner
