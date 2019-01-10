@@ -64,3 +64,8 @@ docker volume create -d "cloudstor:aws" \
   --opt backing=relocatable \
   guacamole-db
 docker stack deploy --compose-file ./shared/docker-compose-volume-fix-guacamole.yml guacamole-fix-volume
+
+docker volume create -d "cloudstor:aws" \
+  --opt size=1 \
+  --opt backing=relocatable \
+    backup
