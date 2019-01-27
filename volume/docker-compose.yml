@@ -1,0 +1,59 @@
+version: '3.7'
+services:
+
+  centos1:
+    image: centos:${CENTOS_TAG:-latest}
+    hostname: centos1
+    command: sleep 36000
+    volumes:
+    - mysharedvol1:/tmp/mysharedvol1
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname==ip-172-31-30-207.us-east-2.compute.internal
+
+  centos2:
+    image: centos:${CENTOS_TAG:-latest}
+    hostname: centos2
+    command: sleep 36000
+    volumes:
+    - mysharedvol1:/tmp/mysharedvol1
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname==ip-172-31-30-207.us-east-2.compute.internal
+
+#  centos3:
+#    image: centos:${CENTOS_TAG:-latest}
+#    hostname: centos3
+#    command: sleep 36000
+#    networks:
+#    - centos2
+#    - centos3
+#    deploy:
+#      replicas: 1
+#      update_config:
+#        parallelism: 1
+#        delay: 10s
+#      restart_policy:
+#        condition: on-failure
+
+volumes:
+  mysharedvol1:
+    external: true
+    name: mysharedvol1
+#  mysharedvol1:
+#    external: true
+#    name: mysharedvol2

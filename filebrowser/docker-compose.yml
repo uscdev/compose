@@ -1,0 +1,29 @@
+version: '3.7'
+services:
+  filebrowser:
+    image: filebrowser/filebrowser:${FILEBROWSER_TAG:-latest}
+    networks:
+      proxy:
+    volumes:
+    - backup:/srv
+    deploy:
+      labels:
+      - com.df.notify=true
+      - com.df.distribute=true
+      - com.df.port=80
+      - com.df.xForwardedProto=true
+      - com.df.httpsOnly=true
+      - com.df.serviceDomain=${FILEBROWSER_SUB_DOMAIN:-filebrowser}.${DOMAIN_NAME:-docker.usc.edu}
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+networks:
+  proxy:
+    external: true
+
+volumes:
+  backup:
+    external: true

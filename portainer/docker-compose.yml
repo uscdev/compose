@@ -22,8 +22,8 @@ services:
   portainer:
     image: portainer/portainer:${PORTAINER_TAG:-latest}
     command: -H tcp://tasks.agent:9001 --tlsskipverify
-    ports:
-      - "9001:9000"
+#    ports:
+#      - "9001:9000"
     volumes:
       - portainer-data:/data
     networks:
@@ -40,6 +40,20 @@ services:
       - com.df.port=9000
       - com.df.httpsOnly=true
       - com.df.serviceDomain=${PORTAINER_SUB_DOMAIN:-portainer}.${DOMAIN_NAME:-docker.usc.edu}
+  backup:
+    image: osixia/backup:${BACKUP_TAG:-latest}
+    environment:
+      - BACKUP_CRON_EXP="${BACKUP_CRON:-0 4 * * *}"
+    volumes:
+      - backup:/data/backup
+      - portainer-data:/data/input
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
 
 networks:
   default:
@@ -51,3 +65,7 @@ networks:
 volumes:
   portainer-data:
     external: true
+    name: ${PORTAINER_DATA:-portainer-data}
+  backup:
+    external: true
+    name: ${BACKUP_DATA:-backup}

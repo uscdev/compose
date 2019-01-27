@@ -78,6 +78,20 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
+  backup:
+    image: osixia/backup:${BACKUP_TAG:-latest}
+    environment:
+      - BACKUP_CRON_EXP="${BACKUP_CRON:-0 4 * * *}"
+    volumes:
+    - backup:/data/backup
+    - jenkins-data:/data/input
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
 
 volumes:
   jenkins-data:
@@ -85,6 +99,10 @@ volumes:
     name: ${JENKINS_DATA:-jenkins-data}
   workspace:
   #    external: true
+  backup:
+    external: true
+    name: ${BACKUP_DATA:-backup}
+
 networks:
   proxy:
     external: true
