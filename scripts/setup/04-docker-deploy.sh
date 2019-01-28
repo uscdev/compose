@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # set -f;export BACKUP_CRON="0 4 * * *";set +f
+# set -f;export BACKUP_CRON="*/10 * * * *";set +f
 
 export SECRET_PATH=/run/secrets
 export PEM_PATH=$SECRET_PATH/certificates/usc
@@ -22,12 +23,13 @@ export DEVOPS_PATH=$USC_DEV_PATH/devops-example
 
 set -f
 
-docker stack deploy --compose-file $COMPOSE_PATH/proxy/docker-compose.yml proxy
 docker stack deploy --compose-file $COMPOSE_PATH/docker-proxy/docker-compose.yml docker-proxy
+docker stack deploy --compose-file $COMPOSE_PATH/proxy/docker-compose.yml proxy
+sleep 10
 
 docker stack deploy --compose-file $COMPOSE_PATH/visualizer/docker-compose.yml visualizer
 docker stack deploy --compose-file $COMPOSE_PATH/portainer/docker-compose.yml portainer
-# docker stack deploy --compose-file $COMPOSE_PATH/filebrowser/docker-compose.yml filebrowser
+docker stack deploy --compose-file $COMPOSE_PATH/filebrowser/docker-compose.yml filebrowser
 
 docker stack deploy --compose-file $COMPOSE_PATH/monitor/docker-compose.yml monitor
 

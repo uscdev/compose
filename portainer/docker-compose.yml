@@ -43,7 +43,7 @@ services:
   backup:
     image: osixia/backup:${BACKUP_TAG:-latest}
     environment:
-      - BACKUP_CRON_EXP="${BACKUP_CRON:-0 4 * * *}"
+      - BACKUP_CRON_EXP=${BACKUP_CRON:-0 4 * * *}
     volumes:
       - backup:/data/backup
       - portainer-data:/data/input

@@ -14,9 +14,9 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
-      placement:
-        constraints:
-          - node.hostname==ip-172-31-30-207.us-east-2.compute.internal
+#      placement:
+#        constraints:
+#          - node.hostname==ip-172-31-30-207.us-east-2.compute.internal
 
   centos2:
     image: centos:${CENTOS_TAG:-latest}
@@ -31,9 +31,9 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
-      placement:
-        constraints:
-          - node.hostname==ip-172-31-30-207.us-east-2.compute.internal
+#      placement:
+#        constraints:
+#          - node.hostname==ip-172-31-30-207.us-east-2.compute.internal
 
 #  centos3:
 #    image: centos:${CENTOS_TAG:-latest}
@@ -53,7 +53,7 @@ services:
 volumes:
   mysharedvol1:
     external: true
-    name: mysharedvol1
+    name: mysharedvol3
 #  mysharedvol1:
 #    external: true
 #    name: mysharedvol2

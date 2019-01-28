@@ -1,0 +1,19 @@
+version: '3.7'
+services:
+
+  centos:
+    image: centos:${CENTOS_TAG:-latest}
+    hostname: centos
+    command: sleep 36000
+    environment:
+      - WW=${test:-"0 4 * * *"}
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+#      placement:
+#        constraints:
+#          - node.hostname==ip-172-31-43-8.us-east-2.compute.internal
