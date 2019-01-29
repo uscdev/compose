@@ -53,8 +53,9 @@ services:
         condition: on-failure
 
   db:
-#    image: mysql:${GUACAMOLE_MYSQL_TAG:-5.7}
-    image: uscdev/guacamole-mysql-populated:${GUACAMOLE_MYSQL_TAG:-5.7}
+#    image: mysql:${GUACAMOLE_MYSQL_TAG:-latest}
+#    image: uscdev/guacamole-mysql-populated:${GUACAMOLE_MYSQL_TAG:-5.7}
+    image: uscdev/guacamole-mysql-populated:${GUACAMOLE_MYSQL_TAG:-latest}
 #    command: sleep 30000
     hostname: db
     networks:
