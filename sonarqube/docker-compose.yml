@@ -7,6 +7,7 @@ services:
     - "9000:9000"
     networks:
     - proxy
+    - docker-proxy
     - sonarnet
     environment:
     - sonar.jdbc.url=jdbc:postgresql://db:5432/sonar
@@ -44,6 +45,8 @@ networks:
   sonarnet:
     driver: overlay
   proxy:
+    external: true
+  docker-proxy:
     external: true
 
 volumes:
