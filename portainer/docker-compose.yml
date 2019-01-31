@@ -41,9 +41,12 @@ services:
       - com.df.httpsOnly=true
       - com.df.serviceDomain=${PORTAINER_SUB_DOMAIN:-portainer}.${DOMAIN_NAME:-docker.usc.edu}
   backup:
-    image: osixia/backup:${BACKUP_TAG:-latest}
+    image: osixia/backup-manager:${BACKUP_MANAGER_TAG:-latest}
+    hostname: ${PORTAINER_BACKUP_HOSTNAME:-portainer-backup}
     environment:
-      - BACKUP_CRON_EXP=${BACKUP_CRON:-0 4 * * *}
+      - BACKUP_CRON_EXP="${BACKUP_CRON:-0 4 * * *}"
+      - BACKUP_MANAGER_TARBALL_DIRECTORIES="/data/input"
+      - BACKUP_MANAGER_ARCHIVE_METHOD="tarball-incremental"
     volumes:
       - backup:/data/backup
       - portainer-data:/data/input

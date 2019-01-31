@@ -1,0 +1,105 @@
+version: '3.7'
+services:
+  backup:
+    image: osixia/backup-manager:${BACKUP_MANAGER_TAG:-latest}
+    hostname: test
+    environment:
+      - BACKUP_MANAGER_CRON_EXP=*/10 * * * *
+      - BACKUP_MANAGER_TARBALL_DIRECTORIES="/data/input"
+      - BACKUP_MANAGER_ARCHIVE_METHOD="tarball-incremental"
+    volumes:
+      - backup:/data/backup
+      - data:/data/input
+#    configs:
+#      - source: backup-manager.conf
+#        target: /container/service/backup-manager/assets/backup-manager.conf
+#        mode: 0664
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+  filebrowser-data:
+    image: filebrowser/filebrowser:${FILEBROWSER_TAG:-latest}
+    networks:
+      proxy:
+    volumes:
+      - data:/srv
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.port=80
+        - com.df.serviceDomain=${FILEBROWSER_SUB_DOMAIN:-filebrowser-data}.${DOMAIN_NAME:-localhost}
+  filebrowser-backup:
+    image: filebrowser/filebrowser:${FILEBROWSER_TAG:-latest}
+    networks:
+      proxy:
+    volumes:
+      - backup:/srv
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.port=80
+        - com.df.serviceDomain=${FILEBROWSER_SUB_DOMAIN:-filebrowser-backup}.${DOMAIN_NAME:-localhost}
+  proxy:
+    image: dockerflow/docker-flow-proxy:${DOCKER_FLOW_PROXY_TAG:-latest}
+    ports:
+      - 80:80
+    networks:
+      - proxy
+    environment:
+      LISTENER_ADDRESS: swarm-listener
+      MODE: swarm
+      SSL_BIND_OPTIONS: no-sslv3 no-tlsv10 no-tlsv11 no-tls-tickets
+      SSL_BIND_CIPHERS: ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256
+      CONNECTION_MODE: ${CONNECTION_MODE:-http-keep-alive}
+    deploy:
+      replicas: 3
+
+  swarm-listener:
+    image: dockerflow/docker-flow-swarm-listener:${DOCKER_FLOW_SWARM_LISTENER_TAG:-latest}
+    networks:
+      - proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DF_NOTIFY_CREATE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/reconfigure
+      - DF_NOTIFY_REMOVE_SERVICE_URL=http://proxy:8080/v1/docker-flow-proxy/remove
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+      resources:
+        reservations:
+          memory: 10M
+        limits:
+          memory: 20M
+
+networks:
+  proxy:
+    external: true
+
+volumes:
+  data:
+    external: true
+  backup:
+    external: true
+
+configs:
+  backup-manager.conf:
+    file: ./config/backup-manager.conf

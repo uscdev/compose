@@ -79,12 +79,15 @@ services:
       restart_policy:
         condition: on-failure
   backup:
-    image: osixia/backup:${BACKUP_TAG:-latest}
+    image: osixia/backup-manager:${BACKUP_MANAGER_TAG:-latest}
+    hostname:  ${JENKINS_BACKUP_HOSTNAME:-jenkins-backup}
     environment:
       - BACKUP_CRON_EXP="${BACKUP_CRON:-0 4 * * *}"
+      - BACKUP_MANAGER_TARBALL_DIRECTORIES="/data/input"
+      - BACKUP_MANAGER_ARCHIVE_METHOD="tarball-incremental"
     volumes:
-    - backup:/data/backup
-    - jenkins-data:/data/input
+      - backup:/data/backup
+      - jenkins-data:/data/input
     deploy:
       replicas: 1
       update_config:
