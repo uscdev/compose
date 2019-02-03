@@ -1,26 +1,5 @@
 #!/usr/bin/env bash
 
-# set -f;export BACKUP_CRON="0 4 * * *";set +f
-# set -f;export BACKUP_CRON="*/10 * * * *";set +f
-
-export SECRET_PATH=/run/secrets
-export PEM_PATH=$SECRET_PATH/certificates/usc
-
-export SITE=swarm
-export DOMAIN_NAME=$SITE.usc.edu
-
-export HOME_PATH=$1
-if [ "$HOME_PATH" = "" ]; then
-    export HOME_PATH=$HOME
-fi
-
-export CODE_PATH=$HOME_PATH/workspace
-export GITHUB_PATH=$CODE_PATH/github
-export USC_PATH=$CODE_PATH/usc
-export USC_DEV_PATH=$GITHUB_PATH/uscdev
-export COMPOSE_PATH=$USC_DEV_PATH/compose
-export DEVOPS_PATH=$USC_DEV_PATH/devops-example
-
 set -f
 
 # docker stack deploy --compose-file $COMPOSE_PATH/docker-proxy/docker-compose.yml docker-proxy

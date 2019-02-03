@@ -66,7 +66,7 @@ services:
 
 # Note Unsee doesn't support 0.16 yet 1/28/19
   alert-manager:
-    image: prom/alertmanager:${ALERT_MANAGER_TAG:-v0.15.3}
+    image: prom/alertmanager:${ALERT_MANAGER_TAG:-latest}
     command:
     - '--config.file=/run/secrets/alert_manager_config'
     - '--storage.path=/alertmanager'
@@ -111,7 +111,7 @@ services:
       - com.df.alertFor=30s
 
   unsee:
-    image: cloudflare/unsee:${UNSEE_TAG:-v0.8.0}
+    image: cloudflare/unsee:${UNSEE_TAG:-latest}
     networks:
     - monitor
     - proxy
@@ -139,7 +139,7 @@ services:
       - com.df.alertFor=30s
 
   grafana:
-    image: grafana/grafana:${GRAFANA_TAG:-5.0.1}
+    image: grafana/grafana:${GRAFANA_TAG:-latest}
     networks:
     - monitor
     - proxy
@@ -230,7 +230,7 @@ services:
           memory: 64M
 
   node-exporter:
-    image: uscdev/node-exporter:${NODE_EXPORTER_TAG:-v0.15.2}
+    image: uscdev/node-exporter:${NODE_EXPORTER_TAG:-latest}
     command:
     - '--path.procfs=/host/proc'
     - '--path.sysfs=/host/sys'
