@@ -1,0 +1,38 @@
+version: '3.7'
+services:
+  backup:
+    image: osixia/backup-manager:${BACKUP_MANAGER_TAG:-latest}
+    hostname: test
+    environment:
+      - BACKUP_MANAGER_CRON_EXP=*/10 * * * *
+      - BACKUP_MANAGER_TARBALL_DIRECTORIES="/data/input"
+      - BACKUP_MANAGER_ARCHIVE_METHOD="${BACKUP_ARCHIVE_METHOD:-tarball-incremental}"
+      - BACKUP_MANAGER_UPLOAD_METHOD="${BACKUP_UPLOAD_METHOD:-none}"
+    volumes:
+      - backup:/data/backup
+      - data:/data/input
+#    configs:
+#      - source: backup-manager.conf
+#        target: /container/service/backup-manager/assets/backup-manager.conf
+#        mode: 0664
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+networks:
+  proxy:
+    external: true
+
+volumes:
+  data:
+    external: true
+  backup:
+    external: true
+
+configs:
+  backup-manager.conf:
+    file: ./config/backup-manager.conf

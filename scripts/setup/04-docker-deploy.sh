@@ -23,9 +23,9 @@ export DEVOPS_PATH=$USC_DEV_PATH/devops-example
 
 set -f
 
-docker stack deploy --compose-file $COMPOSE_PATH/docker-proxy/docker-compose.yml docker-proxy
+# docker stack deploy --compose-file $COMPOSE_PATH/docker-proxy/docker-compose.yml docker-proxy
 docker stack deploy --compose-file $COMPOSE_PATH/proxy/docker-compose.yml proxy
-sleep 10
+sleep 15
 
 docker stack deploy --compose-file $COMPOSE_PATH/visualizer/docker-compose.yml visualizer
 docker stack deploy --compose-file $COMPOSE_PATH/portainer/docker-compose.yml portainer

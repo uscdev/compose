@@ -1,0 +1,48 @@
+version: '3.7'
+services:
+  filebrowser-data:
+    image: filebrowser/filebrowser:${FILEBROWSER_TAG:-latest}
+    networks:
+      proxy:
+    volumes:
+      - data:/srv
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.port=80
+        - com.df.serviceDomain=${FILEBROWSER_SUB_DOMAIN:-filebrowser-data}.${DOMAIN_NAME:-localhost}
+  filebrowser-backup:
+    image: filebrowser/filebrowser:${FILEBROWSER_TAG:-latest}
+    networks:
+      proxy:
+    volumes:
+      - backup:/srv
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.port=80
+        - com.df.serviceDomain=${FILEBROWSER_SUB_DOMAIN:-filebrowser-backup}.${DOMAIN_NAME:-localhost}
+
+networks:
+  proxy:
+    external: true
+
+volumes:
+  data:
+    external: true
+  backup:
+    external: true

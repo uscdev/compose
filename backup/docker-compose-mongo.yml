@@ -1,0 +1,61 @@
+version: '3.7'
+services:
+
+  mongodb:
+    image: mongo:${MONGO_TAG:-latest}
+    command: --storageEngine wiredTiger
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    networks:
+      - mongo-db
+    volumes:
+      - mongo-db:/data/db
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname==ip-172-31-26-33.us-east-2.compute.internal
+
+  backup:
+    image: uscdev/backup-manager:${BACKUP_MANAGER_TAG:-latest}
+    hostname: mongo-backup
+    environment:
+      - BACKUP_MANAGER_CRON_EXP=*/2 * * * *
+#      - BACKUP_MANAGER_TARBALL_DIRECTORIES="/data/input"
+      - BACKUP_MANAGER_ARCHIVE_METHOD=pipe
+      - BACKUP_MANAGER_UPLOAD_METHOD="${BACKUP_UPLOAD_METHOD:-none}"
+      - BACKUP_MANAGER_PIPE_COMMAND_0=mongodump --host ${MONGO_HOST:-mongodb} --port ${MONGO_PORT:-27017} --username=root --password=example --out db
+      - BACKUP_MANAGER_PIPE_NAME_0=mongo_db
+      - BACKUP_MANAGER_PIPE_FILETYPE_0=mongo
+      - BACKUP_MANAGER_PIPE_COMPRESS_0=gzip
+    networks:
+      - mongo-db
+    volumes:
+      - backup:/data/backup
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname==ip-172-31-26-33.us-east-2.compute.internal
+
+networks:
+  mongo-db:
+    driver: overlay
+
+volumes:
+  backup:
+    external: true
+  mongo-db:
+    external: true
+    name: mongox

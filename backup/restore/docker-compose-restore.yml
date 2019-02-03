@@ -1,0 +1,27 @@
+version: '3.7'
+services:
+
+  centos:
+    image: centos:${CENTOS_TAG:-latest}
+    hostname: centos
+    command: >
+      sh -c "echo Start &&
+              tar zxvf /data/backup/portainer-backup-data-input.20190203.master.tar.gz --directory /data/portainer-data &&
+              echo End"
+    volumes:
+      - backup:/data/backup
+      - portainer-data:/data/portainer-data/data/input
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: none
+volumes:
+  portainer-data:
+    external: true
+    name: ${PORTAINER_DATA:-portainer-data}
+  backup:
+    external: true
+    name: ${BACKUP_DATA:-backup}

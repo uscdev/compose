@@ -1,0 +1,64 @@
+version: '3.7'
+services:
+  db:
+    image: uscdev/guacamole-mysql-populated:${GUACAMOLE_MYSQL_TAG:-latest}
+    hostname: db
+    networks:
+    - db
+    volumes:
+    - db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${GUACAMOLE_MYSQL_ROOT_PASSWORD:-example}
+      MYSQL_DATABASE: guacamole_db
+      MYSQL_USER: guacamole_user
+      MYSQL_PASSWORD: ${GUACAMOLE_MYSQL_PASSWORD:-password}
+    user: mysql
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  backup:
+    image: uscdev/backup-manager:${BACKUP_MANAGER_TAG:-latest}
+    hostname: guacamole-db-backup
+    environment:
+      - BACKUP_MANAGER_CRON_EXP=*/2 * * * *
+#      - BACKUP_MANAGER_TARBALL_DIRECTORIES="/data/input"
+      - BACKUP_MANAGER_ARCHIVE_METHOD=pipe
+      - BACKUP_MANAGER_UPLOAD_METHOD="${BACKUP_UPLOAD_METHOD:-none}"
+      - BACKUP_MANAGER_PIPE_COMMAND_0=mysqldump -h db -uguacamole_user -p${GUACAMOLE_MYSQL_PASSWORD:-password} guacamole_db
+      - BACKUP_MANAGER_PIPE_NAME_0=guacamole_db
+      - BACKUP_MANAGER_PIPE_FILETYPE_0=sql
+      - BACKUP_MANAGER_PIPE_COMPRESS_0=gzip
+    networks:
+      - db
+    volumes:
+      - backup:/data/backup
+#    configs:
+#      - source: backup-manager.conf
+#        target: /container/service/backup-manager/assets/backup-manager.conf
+#        mode: 0664
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+#      placement:
+#        constraints:
+#          - node.hostname==ip-172-31-26-33.us-east-2.compute.internal
+
+networks:
+  db:
+    driver: overlay
+
+volumes:
+  db:
+    external: true
+    name: guacamole-db
+  backup:
+    external: true
