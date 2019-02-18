@@ -6,7 +6,7 @@ services:
     hostname: centos
     command: >
       sh -c "echo Start &&
-              tar zxvf /data/backup/portainer-backup-data-input.20190203.master.tar.gz --directory /data/portainer-data &&
+              tar zxvf /data/backup/archive/portainer-backup-data-input.20190218.master.tar.gz --directory /data/portainer-data &&
               echo End"
     volumes:
       - backup:/data/backup

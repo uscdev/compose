@@ -20,6 +20,7 @@ export USC_PATH=$CODE_PATH/usc
 export USC_DEV_PATH=$GITHUB_PATH/uscdev
 export COMPOSE_PATH=$USC_DEV_PATH/compose
 export DEVOPS_PATH=$USC_DEV_PATH/devops-example
+export DEMO_DATA_PATH=$USC_DEV_PATH/demo-data
 
 export PROMETHEUS_TAG=2-18.05.31-4
 export ALERT_MANAGER_TAG=v0.15.3

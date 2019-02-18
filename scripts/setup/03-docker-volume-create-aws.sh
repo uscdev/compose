@@ -69,6 +69,12 @@ docker volume create -d "cloudstor:aws" --opt backing=shared guacamole-db
 #  guacamole-db
 docker stack deploy --compose-file ./shared/docker-compose-volume-fix-guacamole.yml guacamole-fix-volume
 
+docker volume create -d "cloudstor:aws" --opt backing=shared sonarqube-conf-data
+docker volume create -d "cloudstor:aws" --opt backing=shared sonarqube-data
+docker volume create -d "cloudstor:aws" --opt backing=shared sonarqube-extensions-data
+docker volume create -d "cloudstor:aws" --opt backing=shared sonarqube-postgresql-data
+docker volume create -d "cloudstor:aws" --opt backing=shared sonarqube-postgresql-data-db
+
 docker volume create -d "cloudstor:aws" --opt backing=shared backup
 #docker volume create -d "cloudstor:aws" \
 #  --opt size=1 \
