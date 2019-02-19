@@ -7,10 +7,16 @@ services:
     command: >
       sh -c "echo Start &&
               tar zxvf /data/backup/archive/portainer-backup-data-input.20190218.master.tar.gz --directory /data/portainer-data &&
+              tar zxvf /data/backup/archive/sonarqube-backup-opt-sonarqube-data.20190218.master.tar.gz --directory /data/sonarqube-data &&
+              tar zxvf /data/backup/archive/jenkins-backup-data-input.20190218.master.tar.gz --directory /data/jenkins-data &&
+              tar zxvf /data/backup/archive/nexus-backup-data-input.20190218.master.tar.gz --directory /data/nexus-data &&
               echo End"
     volumes:
       - backup:/data/backup
       - portainer-data:/data/portainer-data/data/input
+      - sonarqube-data:/data/sonarqube-data/data/input
+      - jenkins-data:/data/jenkins-data/data/input
+      - nexus-data:/data/nexus-data/data/input
     deploy:
       replicas: 1
       update_config:
@@ -22,6 +28,21 @@ volumes:
   portainer-data:
     external: true
     name: ${PORTAINER_DATA:-portainer-data}
+  sonarqube-conf-data:
+    external: true
+    name: ${SONARQUBE_CONF:-sonarqube-conf-data}
+  sonarqube-data:
+    external: true
+    name: ${SONARQUBE_DATA:-sonarqube-data}
+  sonarqube-extensions-data:
+    external: true
+    name: ${SONARQUBE_EXTENSIONS:-sonarqube-extensions-data}
+  jenkins-data:
+    external: true
+    name: ${JENKINS_DATA:-jenkins-data}
+  nexus-data:
+    external: true
+    name: ${NEXUS_DATA:-nexus-data}
   backup:
     external: true
     name: ${BACKUP_DATA:-backup}
