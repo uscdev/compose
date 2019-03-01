@@ -1,0 +1,48 @@
+version: '3.7'
+services:
+  emailchoice:
+    image: dtr.swarm.usc.edu/emailchoice
+#    ports:
+#      - 80:80
+#      - 443:80
+    secrets:
+      - apache.crt
+      - apache.key
+      - sp-key.pem
+      - sp-cert.pem
+      - my-groups-api.txt
+    networks:
+      - proxy
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+        - com.df.serviceDomain=emailchoice.usc.edu
+        - com.df.httpsOnly=true
+        - com.df.port=443
+        - com.df.sslVerifyNone=true
+secrets:
+  apache.crt:
+    external: true
+    name: cert-emailchoice.usc.edu.pem
+  apache.key:
+    external: true
+    name: emailchoice.usc.edu.key
+  sp-key.pem:
+    external: true
+    name: emailchoice.usc.edu-sp-key.pem
+  sp-cert.pem:
+    external: true
+    name: emailchoice.usc.edu-sp-cert.pem
+  my-groups-api.txt:
+    external: true
+    name: emailchoice.usc.edu-my-groups-api.txt
+networks:
+  proxy:
+    external: true
