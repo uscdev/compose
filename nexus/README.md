@@ -1,6 +1,8 @@
 # nexus
 Nexus plus ssl cert handling
 
+Note: Remember to add the docker realm to enable docker
+
 This upgrades the standard nexus to use SSL (for Docker Trusted Registry)
 
 docker service create --name nexus --replicas 1 --update-delay 10s \
