@@ -6,7 +6,11 @@
 export SECRET_PATH=/run/secrets
 export PEM_PATH=$SECRET_PATH/certificates/usc
 
-export SITE=swarm
+export SITE=$2
+if [ "$SITE" = "" ]; then
+    export SITE=swarm
+fi
+
 export DOMAIN_NAME=$SITE.usc.edu
 
 export HOME_PATH=$1
