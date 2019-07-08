@@ -5,7 +5,7 @@ services:
     ports:
       - 3309:3306
     volumes:
-      - "/mnt/docker/disk2/le-mysql:/var/lib/mysql"
+      - /docker-nfs/le-mysql:/var/lib/mysql
     deploy:
       replicas: 1
       update_config:
@@ -13,8 +13,5 @@ services:
         delay: 10s
       restart_policy:
         condition: on-failure
-      placement:
-        constraints:
-          - node.hostname==${NODE03}
     environment:
       MYSQL_ROOT_PASSWORD: ${DOCKER_WD_MYSQL_PASSWORD}

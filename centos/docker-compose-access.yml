@@ -1,0 +1,19 @@
+version: '3.7'
+services:
+
+  centos1:
+    image: centos:${CENTOS_TAG:-latest}
+    hostname: centos1
+    command: sleep 36000
+    volumes:
+      - /docker-nfs:/var/jenkins_home
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.hostname==swarm-test1.usc.edu

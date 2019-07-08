@@ -23,6 +23,7 @@ services:
       - cert-workday-account-translator.usc.edu.pem
       - cert-itapps.usc.edu.pem
       - cert-device-registration.usc.edu.pem
+      - cert-swarm.usc.edu.pem
 
   swarm-listener:
     image: dockerflow/docker-flow-swarm-listener:${DOCKER_FLOW_SWARM_LISTENER_TAG:-latest}
@@ -62,4 +63,6 @@ secrets:
   cert-itapps.usc.edu.pem:
     external: true
   cert-device-registration.usc.edu.pem:
+    external: true
+  cert-swarm.usc.edu.pem:
     external: true

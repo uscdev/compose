@@ -8,7 +8,6 @@ services:
     - proxy
     volumes:
 #    - nexus-data:/nexus-data
-#    - ${USC_BLOCK_DIR:-/docker-nfs}/nexus:/nexus-data
     - /docker-nfs/nexus:/nexus-data
 #    secrets:
 #      - keystore.jks
@@ -17,25 +16,25 @@ services:
       labels:
       - com.df.notify=true
       - com.df.distribute=true
-      - com.df.serviceDomain.1=${NEXUS_SUB_DOMAIN:-nexus}.${DOMAIN_NAME:-docker.usc.edu}
+      - com.df.serviceDomain.1=nexus.docker.usc.edu
       - com.df.port.1=8081
       - com.df.httpsOnly.1=true
       - com.df.xForwardedProto.1=true
       - com.df.xForwardedProto=true
-      - com.df.serviceDomain.2=${REGISTRY_SUB_DOMAIN:-registry}.${DOMAIN_NAME:-docker.usc.edu}
+      - com.df.serviceDomain.2=registry.docker.usc.edu
       - com.df.port.2=8445
       - com.df.httpsOnly.2=true
-      - com.df.serviceDomain.3=${DTR_SUB_DOMAIN:-dtr}.${DOMAIN_NAME:-docker.usc.edu}
+      - com.df.serviceDomain.3=dtr.docker.usc.edu
       - com.df.port.3=8442
       - com.df.httpsOnly.3=true
-      - com.df.serviceDomain.4=${NEXUS_SUB_DOMAIN:-nexus}.swarm.usc.edu
+      - com.df.serviceDomain.4=nexus.swarm.usc.edu
       - com.df.port.4=8081
       - com.df.httpsOnly.4=true
       - com.df.xForwardedProto.4=true
-      - com.df.serviceDomain.5=${REGISTRY_SUB_DOMAIN:-registry}.swarm.usc.edu
+      - com.df.serviceDomain.5=registry.swarm.usc.edu
       - com.df.port.5=8445
       - com.df.httpsOnly.5=true
-      - com.df.serviceDomain.6=${DTR_SUB_DOMAIN:-dtr}.swarm.usc.edu
+      - com.df.serviceDomain.6=dtr.swarm.usc.edu
       - com.df.port.6=8442
       - com.df.httpsOnly.6=true
       update_config:
