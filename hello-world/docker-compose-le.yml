@@ -1,0 +1,22 @@
+version: '3.7'
+
+services:
+  hello-world:
+    image: tutum/hello-world:${HELLO_WORLD_TAG:-latest}
+    networks:
+      - proxy
+    deploy:
+      replicas: 2
+      labels:
+        - com.df.notify=true
+        - com.df.distribute=true
+#        - com.df.httpsOnly=true
+        - com.df.serviceDomain.1=${DOMAIN_NAME:-touroverflow.com}
+        - com.df.port.1=80
+        - com.df.serviceDomain.2=www.${DOMAIN_NAME:-touroverflow.com}
+        - com.df.port.2=80
+        - com.df.serviceDomain.3=blog.${DOMAIN_NAME:-touroverflow.com}
+        - com.df.port.3=80
+networks:
+  proxy:
+    external: true
