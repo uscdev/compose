@@ -1,12 +1,12 @@
 version: '3.7'
 services:
 
-  centos1:
-    image: centos:${CENTOS_TAG:-latest}
-    hostname: centos1
-    command: sleep 36000
-    volumes:
-      - /docker-nfs:/var/jenkins_home
+  nginx:
+    image: nginx:${NGINX_TAG:-latest}
+    hostname: nginx
+    ports:
+      - 80:80
+      - 443:443
     deploy:
       replicas: 1
       update_config:
