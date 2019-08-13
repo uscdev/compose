@@ -12,12 +12,12 @@ services:
         - com.df.distribute=true
         - com.df.httpsOnly.1=true
         - com.df.serviceDomain.1=www.touroverflow.com
-        - com.df.port.1=8000
+        - com.df.port.1=80
         - com.df.httpsOnly.2=true
         - com.df.serviceDomain.2=blog.touroverflow.com
-        - com.df.port.2=8000
+        - com.df.port.2=80
         - com.df.letsencrypt.email=don@donandann.com
-        - com.df.letsencrypt.host=blog.touroverflow.com,www.touroverflow.com
+        - com.df.letsencrypt.host=www.touroverflow.com
 networks:
   proxy:
     external: true
